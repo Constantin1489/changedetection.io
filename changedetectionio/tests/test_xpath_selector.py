@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import time
+import sys
 from flask import url_for
 from . util import live_server_setup
 
@@ -276,6 +277,7 @@ def test_check_with_prefix_include_filters(client, live_server):
     assert b"Some text thats the same" in res.data #in selector
     assert b"Some text that will change" not in res.data #not in selector
 
+    print(res.data, file=sys.stderr)
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
 
 def test_xpath_20(client, live_server):
@@ -315,6 +317,7 @@ def test_xpath_20(client, live_server):
         follow_redirects=True
     )
 
+    print(res.data, file=sys.stderr)
     assert b"Some text thats the same" in res.data #in selector
     assert b"Some text that will change" in res.data #in selector
 
@@ -357,6 +360,7 @@ def test_xpath_20_function_count(client, live_server):
         follow_redirects=True
     )
 
+    print(res.data, file=sys.stderr)
     assert b"2" in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
@@ -398,6 +402,7 @@ def test_xpath_20_function_count2(client, live_server):
         follow_redirects=True
     )
 
+    print(res.data, file=sys.stderr)
     assert b"2" in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
@@ -438,7 +443,8 @@ def test_xpath_20_function_string_join_matches(client, live_server):
         url_for("preview_page", uuid="first"),
         follow_redirects=True
     )
+    print(res.data, file=sys.stderr)
 
-    assert b"Some text thats the same, Some text that will change" in res.data #in selector
+    assert b"Some text thats the same, Some text that will change" == res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
