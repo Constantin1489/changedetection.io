@@ -361,7 +361,7 @@ def test_xpath_20_function_count(client, live_server):
     )
 
     print(res.data, file=sys.stderr)
-    assert b"24691356" in res.data #in selector
+    assert b"246913579975308642" in res.data #in selector
     #assert b"2" in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
@@ -404,7 +404,7 @@ def test_xpath_20_function_count2(client, live_server):
     )
 
     print(res.data, file=sys.stderr)
-    assert b"24691356" in res.data #in selector
+    assert b"246913579975308642" in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
 
