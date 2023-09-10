@@ -12,7 +12,7 @@ set -e
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 echo "private test"
-pytest tests/test_xpath_selector.py
+pytest -s tests/test_xpath_selector.py
 
 echo "RUNNING WITH BASE_URL SET"
 
