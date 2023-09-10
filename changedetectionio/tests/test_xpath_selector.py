@@ -344,7 +344,7 @@ def test_xpath_20_function_count(client, live_server):
 
     res = client.post(
         url_for("edit_page", uuid="first"),
-        data={"include_filters": "xpath:count(//div)",
+        data={"include_filters": "xpath:count(//div) * 123456789987654321",
               "url": test_url,
               "tags": "",
               "headers": "",
@@ -361,7 +361,8 @@ def test_xpath_20_function_count(client, live_server):
     )
 
     print(res.data, file=sys.stderr)
-    assert b"2" in res.data #in selector
+    assert b"24691356" in res.data #in selector
+    #assert b"2" in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
 
@@ -386,7 +387,7 @@ def test_xpath_20_function_count2(client, live_server):
 
     res = client.post(
         url_for("edit_page", uuid="first"),
-        data={"include_filters": "/html/body/count(div)",
+        data={"include_filters": "/html/body/count(div) * 123456789987654321",
               "url": test_url,
               "tags": "",
               "headers": "",
@@ -403,7 +404,7 @@ def test_xpath_20_function_count2(client, live_server):
     )
 
     print(res.data, file=sys.stderr)
-    assert b"2" in res.data #in selector
+    assert b"24691356" in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
 
@@ -428,7 +429,7 @@ def test_xpath_20_function_string_join_matches(client, live_server):
 
     res = client.post(
         url_for("edit_page", uuid="first"),
-        data={"include_filters": "xpath:string-join(//*[contains(@class, 'sametext')]|//*[matches(@class, 'changetext')], ', ')",
+        data={"include_filters": "xpath:string-join(//*[contains(@class, 'sametext')]|//*[matches(@class, 'changetext')], 'specialconjunction')",
               "url": test_url,
               "tags": "",
               "headers": "",
@@ -445,6 +446,6 @@ def test_xpath_20_function_string_join_matches(client, live_server):
     )
     print(res.data, file=sys.stderr)
 
-    assert b"Some text thats the same, Some text that will change" == res.data #in selector
+    assert b"Some text thats the samespecialconjunctionSome text that will change" in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
