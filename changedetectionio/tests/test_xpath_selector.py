@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import sys
 import time
 from flask import url_for
 from . util import live_server_setup
@@ -95,6 +96,7 @@ def test_check_xpath_filter_utf8(client, live_server):
     assert b"Updated watch." in res.data
     time.sleep(3)
     res = client.get(url_for("index"))
+    print(res.data, file=sys.stderr)
     assert b'Unicode strings with encoding declaration are not supported.' not in res.data
     res = client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
     assert b'Deleted' in res.data
@@ -149,6 +151,7 @@ def test_check_xpath_text_function_utf8(client, live_server):
     assert b"Updated watch." in res.data
     time.sleep(3)
     res = client.get(url_for("index"))
+    print(res.data, file=sys.stderr)
     assert b'Unicode strings with encoding declaration are not supported.' not in res.data
 
     # The service should echo back the request headers
