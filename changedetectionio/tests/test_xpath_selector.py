@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import time
+import sys
 from flask import url_for
 from . util import live_server_setup
 
@@ -319,6 +320,7 @@ def test_failed_all_test_before(client, live_server):
     )
 
     # non UTF-8 string
+    print(res.data, file=sys.stderr)
     assert b"We\xe2\x80\x99ll be having a maintenance break" in res.data #in selector
     #assert b"You’ve heard of the Queen’s Gambit, now get ready for the King’s Gambit" in res.data #in selector
 
