@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import time
+import sys
 from flask import url_for
 from . util import live_server_setup
 
@@ -275,5 +276,53 @@ def test_check_with_prefix_include_filters(client, live_server):
 
     assert b"Some text thats the same" in res.data #in selector
     assert b"Some text that will change" not in res.data #not in selector
+
+    client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
+
+def test_non_UTF_8_XPath_extraction(client, live_server):
+    res = client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
+    assert b'Deleted' in res.data
+
+    # Give the endpoint time to spin up
+    time.sleep(1)
+    # read a non-utf-8 HTML file.
+    with open("tests/non_UTF_8_XPath_extraction_HTML.bin", "rb") as data:
+        d = data.read()
+
+    # read a non-utf-8 HTML answer file.
+    with open("tests/non_UTF_8_XPath_extraction_HTML_answer.bin", "rb") as answer_data:
+        answer = answer_data.read()[:-1]
+
+    with open("test-datastore/endpoint-content.txt", "wb") as f:
+        f.write(d)
+
+    # Add our URL to the import page
+    test_url = url_for('test_endpoint', _external=True)
+    res = client.post(
+        url_for("import_page"),
+        data={"urls": test_url},
+        follow_redirects=True
+    )
+    assert b"1 Imported" in res.data
+    time.sleep(3)
+
+    res = client.post(
+        url_for("edit_page", uuid="first"),
+        data={"include_filters":  "xpath://div[@class='tweet-content media-body']", "url": test_url, "tags": "", "headers": "", 'fetch_backend': "html_requests"},
+        follow_redirects=True
+    )
+
+    assert b"Updated watch." in res.data
+    time.sleep(3)
+
+    res = client.get(
+        url_for("preview_page", uuid="first"),
+        follow_redirects=True
+    )
+
+    print(res.data, file=sys.stderr)
+    # answer: non UTF-8 binary string
+    assert b'We\xe2\x80\x9a\xc3\x84\xc3\xb4ll be having a maintenance break' in res.data #in selector
+    #assert br'We\xe2\x80\x9a\xc3\x84\xc3\xb4ll be having a maintenance break' in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
