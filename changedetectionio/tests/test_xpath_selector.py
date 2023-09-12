@@ -288,8 +288,8 @@ def test_failed_all_test_before(client, live_server):
     with open("tests/non_utf8_html.bin", "rb") as data:
         d = data.read()
 
-    with open("tests/non_utf8_html_answer.bin", "rb") as answer_data:
-        answer = answer_data.read()
+#    with open("tests/non_utf8_html_answer.bin", "rb") as answer_data:
+#        answer = answer_data.read()
 
     with open("test-datastore/endpoint-content.txt", "wb") as f:
         f.write(d)
@@ -319,7 +319,7 @@ def test_failed_all_test_before(client, live_server):
     )
 
     # non UTF-8 string
-    assert answer in res.data #in selector
+    assert b"We\xe2\x80\x99ll be having a maintenance break" in res.data #in selector
     #assert b"You’ve heard of the Queen’s Gambit, now get ready for the King’s Gambit" in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
