@@ -1,5 +1,6 @@
 
 from bs4 import BeautifulSoup
+import sys
 from inscriptis import get_text
 from inscriptis.model.config import ParserConfig
 from jsonpath_ng.ext import parse
@@ -52,8 +53,13 @@ def element_removal(selectors: List[str], html_content):
 # Return str Utf-8 of matched rules
 def xpath_filter(xpath_filter, html_content, append_pretty_line_formatting=False):
     from lxml import etree, html
+    print(html_content, file=sys.stderr)
 
-    tree = html.fromstring(bytes(html_content, encoding='utf-8'))
+    try:
+        tree = etree.HTML(html_content)
+    except:
+        #Unicode strings with encoding declaration are not supported. Please use bytes input or XML fragments without declaration.
+        tree = html.fromstring(bytes(html_content, encoding='utf-8'))
     html_block = ""
 
     r = tree.xpath(xpath_filter.strip(), namespaces={'re': 'http://exslt.org/regular-expressions'})

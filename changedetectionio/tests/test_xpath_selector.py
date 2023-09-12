@@ -292,8 +292,8 @@ def test_failed_all_test_before(client, live_server):
 #    with open("tests/non_utf8_html_answer.bin", "rb") as answer_data:
 #        answer = answer_data.read()
 
-    with open("test-datastore/endpoint-content.txt", "wb") as f:
-        f.write(d)
+    with open("test-datastore/endpoint-content.txt", "w") as f:
+        f.write(d.decode())
 
     # Add our URL to the import page
     test_url = url_for('test_endpoint', _external=True)
