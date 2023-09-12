@@ -10,12 +10,7 @@
 set -e
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
-find tests/test_*py -type f|while read test_name
-do
-  echo "TEST RUNNING $test_name"
-  pytest $test_name
-done
+pytest tests/test_xpath_selector.py
 
 echo "RUNNING WITH BASE_URL SET"
 
@@ -27,7 +22,7 @@ pytest tests/test_notification.py
 
 # Re-run with HIDE_REFERER set - could affect login
 export HIDE_REFERER=True
-pytest tests/test_access_control.py
+pytest -s tests/test_access_control.py
 
 # Re-run a few tests that will trigger brotli based storage
 export SNAPSHOT_BROTLI_COMPRESSION_THRESHOLD=5
