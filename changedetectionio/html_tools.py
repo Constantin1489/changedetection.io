@@ -54,8 +54,12 @@ def xpath_filter(xpath_filter, html_content, append_pretty_line_formatting=False
     from lxml import etree, html
     import sys
     print("line number: 55 /mnt/finalresort/shelf-production/kvm/scripts/xpath3/changedetection.io/changedetectionio/html_tools.py  hello world", file=sys.stderr)
+    print(html_content, file=sys.stderr)
 
-    tree = html.fromstring(bytes(html_content, encoding='utf-8'))
+    try:
+        tree = etree.HTML(html_content)
+    except:
+        tree = html.fromstring(bytes(html_content, encoding='utf-8'))
     html_block = ""
     print("line number: 59 /mnt/finalresort/shelf-production/kvm/scripts/xpath3/changedetection.io/changedetectionio/html_tools.py  hello world", file=sys.stderr)
 

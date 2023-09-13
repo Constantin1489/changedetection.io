@@ -1,0 +1,15 @@
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<style>
+p {
+  @charset EUC-KR;
+  color: orange;
+  }
+</style>
+</head>
+<body>
+<p>혼돈은 당연하다.</p>
+<p>Chaos is natural.</p>
+</body>
+</html>

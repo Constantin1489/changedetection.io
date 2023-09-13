@@ -271,12 +271,15 @@ class perform_site_check(difference_detection_processor):
                         raise FilterNotFoundInResponse(include_filters_rule)
 
                 if has_subtractive_selectors:
+                    print("line number: 273 /mnt/finalresort/shelf-production/kvm/scripts/xpath3/changedetection.io/changedetectionio/processors/text_json_diff.py  hello world", file=sys.stderr)
                     html_content = html_tools.element_removal(subtractive_selectors, html_content)
 
                 if is_source:
+                    print("line number: 277 /mnt/finalresort/shelf-production/kvm/scripts/xpath3/changedetection.io/changedetectionio/processors/text_json_diff.py  hello world", file=sys.stderr)
                     stripped_text_from_html = html_content
                 else:
                     # extract text
+                    print("line number: 281 /mnt/finalresort/shelf-production/kvm/scripts/xpath3/changedetection.io/changedetectionio/processors/text_json_diff.py  hello world", file=sys.stderr)
                     do_anchor = self.datastore.data["settings"]["application"].get("render_anchor_tag_content", False)
                     stripped_text_from_html = \
                         html_tools.html_to_text(
