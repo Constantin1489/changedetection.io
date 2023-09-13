@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import sys
 import logging
 import os
 import re
@@ -242,17 +243,20 @@ class perform_site_check(difference_detection_processor):
             # If not JSON,  and if it's not text/plain..
             if 'text/plain' in fetcher.get_all_headers().get('content-type', '').lower():
                 # Don't run get_text or xpath/css filters on plaintext
+                print("line number: 244 /mnt/finalresort/shelf-production/kvm/scripts/xpath3/changedetection.io/changedetectionio/processors/text_json_diff.py  hello world", file=sys.stderr)
                 stripped_text_from_html = html_content
             else:
                 # Does it have some ld+json price data? used for easier monitoring
                 update_obj['has_ldjson_price_data'] = html_tools.has_ldjson_product_info(fetcher.content)
 
+                print("line number: 249 /mnt/finalresort/shelf-production/kvm/scripts/xpath3/changedetection.io/changedetectionio/processors/text_json_diff.py  hello world", file=sys.stderr)
                 # Then we assume HTML
                 if has_filter_rule:
                     html_content = ""
 
                     for filter_rule in include_filters_rule:
                         # For HTML/XML we offer xpath as an option, just start a regular xPath "/.."
+                        print("line number: 255 /mnt/finalresort/shelf-production/kvm/scripts/xpath3/changedetection.io/changedetectionio/processors/text_json_diff.py  hello world", file=sys.stderr)
                         if filter_rule[0] == '/' or filter_rule.startswith('xpath:'):
                             html_content += html_tools.xpath_filter(xpath_filter=filter_rule.replace('xpath:', ''),
                                                                     html_content=fetcher.content,
