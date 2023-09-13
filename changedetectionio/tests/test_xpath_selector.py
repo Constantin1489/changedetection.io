@@ -285,16 +285,30 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
     # Give the endpoint time to spin up
     time.sleep(1)
     # read a non-utf-8 HTML file.
-    with open("tests/non_UTF_8_XPath_extraction_HTML.bin", "rb") as data:
-        d = data.read()
+    #with open("tests/non_UTF_8_XPath_extraction_HTML.bin", "rb") as data:
+    #    d = data.read()
+
     import sys
-    print("####################", file=sys.stderr)
-    print(d, file=sys.stderr)
-    print("####################", file=sys.stderr)
+    d = """<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=cp949">
+<style>
+p {
+  color: orange;
+  }
+</style>
+</head>
+<body>
+<p>혼돈은 당연하다. Chaos is natural.</p>
+</body>
+</html>"""
 
     with open("test-datastore/endpoint-content.txt", "wb") as f:
-        f.write(d)
+        f.write(d.encode('utf-8'))
 
+    print("####################", file=sys.stderr)
+    print(d.encode('utf-8'), file=sys.stderr)
+    print("####################", file=sys.stderr)
     # Add our URL to the import page
     test_url = url_for('test_endpoint', _external=True)
     res = client.post(
@@ -307,7 +321,7 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
 
     res = client.post(
         url_for("edit_page", uuid="first"),
-        data={"include_filters":  "xpath://div[@class='tweet-content media-body']", "url": test_url, "tags": "", "headers": "", 'fetch_backend': "html_requests"},
+        data={"include_filters":  "xpath://p", "url": test_url, "tags": "", "headers": "", 'fetch_backend': "html_requests"},
         follow_redirects=True
     )
 
@@ -318,6 +332,9 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
         url_for("preview_page", uuid="first"),
         follow_redirects=True
     )
+    print("######  res.data #####", file=sys.stderr)
+    print(res.data, file=sys.stderr)
+    print("####################", file=sys.stderr)
     # answer: non UTF-8 binary string
     # b'We\xc3\xa2\xc2\x80\xc2\x9a\xc3\x83\xc2\x84\xc3\x83\xc2\xb4ll be having a maintenance break' is a wrong encoding result.
     assert b'We\xe2\x80\x9a\xc3\x84\xc3\xb4ll be having a maintenance break' in res.data #in selector
