@@ -287,6 +287,10 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
     # read a non-utf-8 HTML file.
     with open("tests/non_UTF_8_XPath_extraction_HTML.bin", "rb") as data:
         d = data.read()
+    import sys
+    print("####################", file=sys.stderr)
+    print(d, file=sys.stderr)
+    print("####################", file=sys.stderr)
 
     with open("test-datastore/endpoint-content.txt", "wb") as f:
         f.write(d)
