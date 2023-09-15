@@ -297,7 +297,14 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
     # read a non-utf-8 HTML file.
     import sys
     print("####################", file=sys.stderr)
-    d = b"""<html lang="ko">\n<head>\n<meta http-equiv="Content-Type" content="text/html;charset=EUC-KR">\n<style>\np {\n  @charset EUC-KR;\n  color: orange;\n}\n</style>\n</head>\n<body>\n<p>\xed\x98\xbc\xeb\x8f\x88\xec\x9d\x80\xeb\x8b\xb9\xec\x97\xb0\xed\x95\x98\xeb\x8b\xa4.</p>\n<p>Chaos is natural.</p>\n</body>\n</html>\n"""
+    d = b'<html lang="ko">\n<head>\n<meta htt'
+    b'p-equiv="Content-Type" content="tex'
+    b't/html;charset=EUC-KR">\n<style>\n'
+    b'p {\n  @charset EUC-KR;\n  color: o'
+    b'range;\n}\n</style>\n</head>\n<body'
+    b'>\n<p>\xed\x98\xbc\xeb\x8f\x88\xec\x9d\x80\xeb\x8b\xb9\xec\x97\xb0\xed\x95\x98\xeb\x8b\xa4.'
+    b'</p>\n<p>Chaos is natural.</p>\n</body>\n</html>\n'
+    #d = b"""<html lang="ko">\n<head>\n<meta http-equiv="Content-Type" content="text/html;charset=EUC-KR">\n<style>\np {\n  @charset EUC-KR;\n  color: orange;\n}\n</style>\n</head>\n<body>\n<p>\xed\x98\xbc\xeb\x8f\x88\xec\x9d\x80\xeb\x8b\xb9\xec\x97\xb0\xed\x95\x98\xeb\x8b\xa4.</p>\n<p>Chaos is natural.</p>\n</body>\n</html>\n"""
 
     with open("test-datastore/endpoint-content.txt", "wb") as f:
         f.write(d)
