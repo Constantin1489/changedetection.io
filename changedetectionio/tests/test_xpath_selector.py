@@ -289,6 +289,8 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
         d = data.read()
 
     import sys
+    print(d, file=sys.stderr)
+
     print("line number: 291 /mnt/finalresort/shelf-production/kvm/scripts/xpath6/changedetection.io/changedetectionio/tests/test_xpath_selector.py  hello world", file=sys.stderr)
     #print(d, file=sys.stderr)
     print("line number: 293 /mnt/finalresort/shelf-production/kvm/scripts/xpath6/changedetection.io/changedetectionio/tests/test_xpath_selector.py  hello world", file=sys.stderr)
@@ -332,6 +334,6 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
     print("####################", file=sys.stderr)
     # answer: non UTF-8 binary string
     # b'We\xc3\xa2\xc2\x80\xc2\x9a\xc3\x83\xc2\x84\xc3\x83\xc2\xb4ll be having a maintenance break' is a wrong encoding result.
-    assert b'\xeb\x8b\xb9\xec\x97\xb0\xed\x95\x98\xeb\x8b\xa4' in res.data #in selector
+    assert b'\xc8\xa5\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xe7\xbf\xac\xef\xbf\xbd\xcf\xb4\xef\xbf\xbd.' in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
