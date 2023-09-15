@@ -285,8 +285,8 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
     # Give the endpoint time to spin up
     time.sleep(1)
     #read a non-utf-8 HTML file.
-#    with open("tests/non_UTF_8_XPath_extraction_HTML4.bin", "rb") as data:
-#        d = data.read()
+    with open("tests/non_UTF_8_XPath_extraction_HTML4.bin", "rb") as data:
+        d = data.read()
 
     import sys
     print("line number: 291 /mnt/finalresort/shelf-production/kvm/scripts/xpath6/changedetection.io/changedetectionio/tests/test_xpath_selector.py  hello world", file=sys.stderr)
@@ -297,11 +297,6 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
     # read a non-utf-8 HTML file.
     import sys
     print("####################", file=sys.stderr)
-    d = b"""<html lang="ko">\n<head>\n<meta http-equiv="Content-Type" content="text/html;"""
-    """charset=EUC-KR">\n<style>\np {\n  @charset EUC-KR;\n  color: orange;\n"""
-    """}\n</style>\n</head>\n<body>\n<p>\xed\x98\xbc\xeb\x8f\x88\xec\x9d\x80"""
-    """\xeb\x8b\xb9\xec\x97\xb0\xed\x95\x98\xeb\x8b\xa4.</p>\n<p>Chaos is"""
-    """natural.</p>\n</body>\n</html>\n"""
 
     with open("test-datastore/endpoint-content.txt", "wb") as f:
         f.write(d)
