@@ -300,6 +300,7 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
     import sys
     print("####################", file=sys.stderr)
 
+    d = b'<html lang="ko">\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">\n<style>\np {\n  @charset EUC-KR;\n  color: orange;\n  }\n</style>\n</head>\n<body>\n<p>\xc8\xa5\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xe7\xbf\xac\xef\xbf\xbd\xcf\xb4\xef\xbf\xbd.</p>\n<p>Chaos is natural.</p>\n</body>\n</html>\n'
     with open("test-datastore/endpoint-content.txt", "wb") as f:
         f.write(d)
 
