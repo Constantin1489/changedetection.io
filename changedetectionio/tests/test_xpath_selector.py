@@ -285,19 +285,23 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
     # Give the endpoint time to spin up
     time.sleep(1)
     #read a non-utf-8 HTML file.
-    with open("tests/non_UTF_8_XPath_extraction_HTML4.bin", "rb") as data:
-        d = data.read()
+#    with open("tests/non_UTF_8_XPath_extraction_HTML4.bin", "rb") as data:
+#        d = data.read()
 
     import sys
     print("line number: 291 /mnt/finalresort/shelf-production/kvm/scripts/xpath6/changedetection.io/changedetectionio/tests/test_xpath_selector.py  hello world", file=sys.stderr)
-    print(d, file=sys.stderr)
+    #print(d, file=sys.stderr)
     print("line number: 293 /mnt/finalresort/shelf-production/kvm/scripts/xpath6/changedetection.io/changedetectionio/tests/test_xpath_selector.py  hello world", file=sys.stderr)
 
 #<meta http-equiv="Content-Type" content="text/html; charset=cp949">
     # read a non-utf-8 HTML file.
     import sys
     print("####################", file=sys.stderr)
-    print("####################", file=sys.stderr)
+    d = b"""<html lang="ko">\n<head>\n<meta http-equiv="Content-Type" content="text/html;"""
+    """charset=EUC-KR">\n<style>\np {\n  @charset EUC-KR;\n  color: orange;\n"""
+    """}\n</style>\n</head>\n<body>\n<p>\xed\x98\xbc\xeb\x8f\x88\xec\x9d\x80"""
+    """\xeb\x8b\xb9\xec\x97\xb0\xed\x95\x98\xeb\x8b\xa4.</p>\n<p>Chaos is"""
+    """natural.</p>\n</body>\n</html>\n"""
 
     with open("test-datastore/endpoint-content.txt", "wb") as f:
         f.write(d)
@@ -333,6 +337,6 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
     print("####################", file=sys.stderr)
     # answer: non UTF-8 binary string
     # b'We\xc3\xa2\xc2\x80\xc2\x9a\xc3\x83\xc2\x84\xc3\x83\xc2\xb4ll be having a maintenance break' is a wrong encoding result.
-    assert b'We\xe2\x80\x9a\xc3\x84\xc3\xb4ll be having a maintenance break' in res.data #in selector
+    assert b'\xeb\x8b\xb9\xec\x97\xb0\xed\x95\x98\xeb\x8b\xa4' in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
