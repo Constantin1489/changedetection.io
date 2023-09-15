@@ -299,7 +299,15 @@ def test_non_UTF_8_XPath_extraction(client, live_server):
     # read a non-utf-8 HTML file.
     import sys
     print("####################", file=sys.stderr)
-
+    d = b'<html lang="ko">\n<head>\n<met'
+    d += b'a http-equiv="Content-Type" c'
+    d += b'ontent="text/html; charset=EUC'
+    d += b'-KR">\n<style>\np {\n  @charset'
+    d += b' EUC-KR;\n  color: orange;\n  }'
+    d += b'\n</style>\n</head>\n<body>\n<p>'
+    d += b'\xc8\xa5\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd '
+    d += b'\xef\xbf\xbd\xe7\xbf\xac\xef\xbf\xbd\xcf\xb4\xef\xbf\xbd.<'
+    d += b'/p>\n<p>Chaos is natural.</p>\n</body>\n</html>\n'
     with open("test-datastore/endpoint-content.txt", "wb") as f:
         f.write(d)
 
