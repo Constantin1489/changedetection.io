@@ -277,3 +277,88 @@ def test_check_with_prefix_include_filters(client, live_server):
     assert b"Some text that will change" not in res.data #not in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
+
+def test_XML_but_with_html_parser(client, live_server):
+    '''
+    the case HTML parser goes wrong with XML.
+    '''
+    res = client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
+    assert b'Deleted' in res.data
+
+    # Give the endpoint time to spin up
+    time.sleep(1)
+
+    d = b"<?xml version='1.0' encoding='UTF-8'?><note><from>Melissa</from><to>Constantin</to><body>The document you asked for</body></note>"
+
+    with open("test-datastore/endpoint-content.txt", "wb") as f:
+        f.write(d)
+
+    # Add our URL to the import page
+    test_url = url_for('test_endpoint', _external=True)
+    res = client.post(
+        url_for("import_page"),
+        data={"urls": test_url},
+        follow_redirects=True
+    )
+    assert b"1 Imported" in res.data
+    time.sleep(3)
+
+    res = client.post(
+        url_for("edit_page", uuid="first"),
+        data={"include_filters":  "xpath://body", "url": test_url, "tags": "", "headers": "", 'fetch_backend': "html_requests"},
+        follow_redirects=True
+    )
+
+    assert b"Updated watch." in res.data
+    time.sleep(3)
+
+    res = client.get(
+        url_for("preview_page", uuid="first"),
+        follow_redirects=True
+    )
+
+    assert b'MelissaConstantinThe' not in res.data #not in selector
+    client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
+
+def test_XML_with_xml_flag(client, live_server):
+    res = client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
+    assert b'Deleted' in res.data
+
+    # Give the endpoint time to spin up
+    time.sleep(1)
+
+    d = b"<?xml version='1.0' encoding='UTF-8'?><note><from>Melissa</from><to>Constantin</to><body>The document you asked for</body></note>"
+
+    with open("test-datastore/endpoint-content.txt", "wb") as f:
+        f.write(d)
+
+    # Add our URL to the import page
+    test_url = 'xml:'+url_for('test_endpoint', _external=True)
+    res = client.post(
+        url_for("import_page"),
+        data={"urls": test_url},
+        follow_redirects=True
+    )
+    assert b"1 Imported" in res.data
+    time.sleep(3)
+
+    res = client.post(
+        url_for("edit_page", uuid="first"),
+        data={"include_filters":  "xpath://body", "url": test_url, "tags": "", "headers": "", 'fetch_backend': "html_requests"},
+        follow_redirects=True
+    )
+
+    assert b"Updated watch." in res.data
+    time.sleep(3)
+
+    res = client.get(
+        url_for("preview_page", uuid="first"),
+        follow_redirects=True
+    )
+
+    assert b'MelissaConstantinThe' not in res.data #not in selector
+    assert b'Melissa' not in res.data #not in selector
+    assert b'Constantin' not in res.data #not in selector
+    assert b'The document you asked for' in res.data #in selector
+
+    client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
