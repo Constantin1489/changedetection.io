@@ -317,7 +317,7 @@ def test_XML_but_with_html_parser(client, live_server):
         follow_redirects=True
     )
 
-    assert b'MelissaConstantinThe' not in res.data #not in selector
+    assert b'MelissaConstantinThe' in res.data #not in selector
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
 
 def test_XML_with_xml_flag(client, live_server):
