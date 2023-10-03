@@ -277,3 +277,52 @@ def test_check_with_prefix_include_filters(client, live_server):
     assert b"Some text that will change" not in res.data #not in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
+
+def test_non_UTF_8_XPath_double_encoded(client, live_server):
+    res = client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
+    assert b'Deleted' in res.data
+
+    # Give the endpoint time to spin up
+    time.sleep(1)
+
+    # A poorly configured non-utf-8 HTML of server-side.
+    #test_return_data = b'\xed\x98\xbc\xeb\x8f\x88\xec\x9d\x80 \xeb\x8b\xb9\xec\x97\xb0\xed\x95\x98\xeb\x8b\xa4'
+    d = b'<html lang="ko">\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">\n<style>\np {\n  @charset EUC-KR;\n  color: orange;\n  }\n</style>\n</head>\n<body>\n<p>\xed\x98\xbc\xeb\x8f\x88\xec\x9d\x80 \xeb\x8b\xb9\xec\x97\xb0\xed\x95\x98\xeb\x8b\xa4.</p>\n<p>If you are reading this, then server sent bytes successfully.</p>\n</body>\n</html>\n'
+
+    with open("test-datastore/endpoint-content.txt", "wb") as f:
+        f.write(d)
+
+    # Add our URL to the import page
+    test_url = url_for('test_endpoint', _external=True)
+    res = client.post(
+        url_for("import_page"),
+        data={"urls": test_url},
+        follow_redirects=True
+    )
+    assert b"1 Imported" in res.data
+    time.sleep(3)
+
+    res = client.post(
+        url_for("edit_page", uuid="first"),
+        data={"include_filters":  "xpath://p", "url": test_url, "tags": "", "headers": "", 'fetch_backend': "html_requests"},
+        follow_redirects=True
+    )
+
+    assert b"Updated watch." in res.data
+    time.sleep(3)
+
+    res = client.get(
+        url_for("preview_page", uuid="first"),
+        follow_redirects=True
+    )
+    import sys
+
+    # b'\xed\x98\xbc\xe5\x8d\xa0\xec\x8f\x99\xec\x98\x99\xe5\x8d\xa0\xec\x8f\x99\xec\x98\x99 \xe5\x8d\xa0\xec\x8d\xb9\xec\x97\xb0\xe5\x8d\xa0\xec\x8b\xb9\xeb\x8c\x90\xec\x98\x99.' is a wrong encoding result.
+    # Above wrong answer is `answer_below.decode('euc-kr').encode('utf-8')`.
+    print('##################')
+    print(res.data)
+    print('##################')
+    assert b'If you are reading this, then server sent bytes successfully.' in res.data #in selector
+    #assert b'\xc8\xa5\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xe7\xbf\xac\xef\xbf\xbd\xcf\xb4\xef\xbf\xbd.' in res.data #in selector
+
+    client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
