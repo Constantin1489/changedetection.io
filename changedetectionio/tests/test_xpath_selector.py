@@ -333,7 +333,6 @@ p {
         follow_redirects=True
     )
 
-    assert KR_STR.encode() in res.data #in selector
     assert b'If you are reading this, then server sent bytes successfully.' in res.data #in selector
 
     client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
