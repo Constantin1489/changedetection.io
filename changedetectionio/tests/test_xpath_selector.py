@@ -286,7 +286,7 @@ def test_allow_server_respond_with_bytes(client, live_server):
     time.sleep(1)
 
     # A poorly configured non-utf-8 HTML of server-side.
-    KR_BYTES_EUC-KR = '혼돈은 자연스럽다'.encode('euc-kr')
+    kr_bytes_euc-kr = '혼돈은 자연스럽다'.encode('euc-kr')
     d = b'''<html lang="ko">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
