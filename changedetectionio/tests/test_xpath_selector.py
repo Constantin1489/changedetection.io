@@ -286,8 +286,25 @@ def test_allow_server_respond_with_bytes(client, live_server):
     time.sleep(1)
 
     # A poorly configured non-utf-8 HTML of server-side.
-    d = b'<html lang="ko">\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">\n<style>\np {\n  @charset EUC-KR;\n  color: orange;\n  }\n</style>\n</head>\n<body>\n<p>\xc8\xa5\xb5\xb7\xc0\xba \xb4\xe7\xbf\xac\xc7\xcf\xb4\xd9..</p>\n<p>If you are reading this, then server sent bytes successfully.</p>\n</body>\n</html>\n'
+    KR_BYTES_EUC-KR = '혼돈은 자연스럽다'.encode('euc-kr')
+    d = b'''<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<style>
+p {
+  @charset EUC-KR;
+  color: orange;
+  }
+</style>
+</head>
+<body>
+<p>%b..</p>
+<p>If you are reading this, then server sent bytes successfully.</p>
+</body>
+</html>
+''' % KR_BYTES_EUC-KR
 
+    # This file cannot be read with UTF-8.
     with open("test-datastore/endpoint-content.txt", "wb") as f:
         f.write(d)
 
@@ -314,7 +331,6 @@ def test_allow_server_respond_with_bytes(client, live_server):
         url_for("preview_page", uuid="first"),
         follow_redirects=True
     )
-    import sys
 
     assert b'If you are reading this, then server sent bytes successfully.' in res.data #in selector
 
