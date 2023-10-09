@@ -1,4 +1,5 @@
 from distutils.util import strtobool
+import sys
 
 from flask import (
     flash
@@ -6,6 +7,7 @@ from flask import (
 
 from . model import App, Watch
 from copy import deepcopy, copy
+import sys
 from os import path, unlink
 from threading import Lock
 import json
@@ -131,7 +133,12 @@ class ChangeDetectionStore:
 
         # Finally start the thread that will manage periodic data saves to JSON
         save_data_thread = threading.Thread(target=self.save_datastore)
+        #lucky draw
+        #save_data_thread.daemon = True
         save_data_thread.start()
+        print('##############waiting joining')
+        #save_data_thread.join()
+        #print('joining done')
 
     def set_last_viewed(self, uuid, timestamp):
         logging.debug("Setting watch UUID: {} last viewed to {}".format(uuid, int(timestamp)))
@@ -264,7 +271,17 @@ class ChangeDetectionStore:
 
         # Incase these are copied across, assume it's a reference and deepcopy()
         apply_extras = deepcopy(extras)
+        import sys
+        print(f"ln: 273 - addwatch  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
+        print(f'{apply_extras=}', file=sys.stderr)
+        print(f'{dir(apply_extras)=}', file=sys.stderr)
+        try:
+            print(f'{vars(apply_extras)=}', file=sys.stderr)
+        except:
+            print(f'novars', file=sys.stderr)
+        print(apply_extras.get('tags'), file=sys.stderr)
         apply_extras['tags'] = [] if not apply_extras.get('tags') else apply_extras.get('tags')
+        print(apply_extras.get('tags'), file=sys.stderr)
 
         # Was it a share link? try to fetch the data
         if (url.startswith("https://changedetection.io/share/")):
@@ -403,15 +420,26 @@ class ChangeDetectionStore:
 
 
     def sync_to_json(self):
-        logging.info("Saving JSON..")
+        import traceback
+        print('######## traceback ###########')
+        for line in traceback.format_stack():
+            print(line.strip())
+        print('######## traceback ###########')
+        logging.info("logging Saving JSON..")
         print("Saving JSON..")
         try:
+            print(f"ln: 412 - sync_to_json  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
             data = deepcopy(self.__data)
+            print(f"ln: 413 - sync_to_json  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
         except RuntimeError as e:
+            print(f"ln: 421 - sync_to_jsonRUNTIMEERROR  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
             # Try again in 15 seconds
             time.sleep(15)
             logging.error ("! Data changed when writing to JSON, trying again.. %s", str(e))
+            print(f"ln: 425 - sync_to_jsonRUNTIMEERROR  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
+            # recursively
             self.sync_to_json()
+            print(f"ln: 427 - sync_to_jsonRUNTIMEERROR  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
             return
         else:
 
@@ -419,14 +447,19 @@ class ChangeDetectionStore:
                 # Re #286  - First write to a temp file, then confirm it looks OK and rename it
                 # This is a fairly basic strategy to deal with the case that the file is corrupted,
                 # system was out of memory, out of RAM etc
+                print(f"ln: 429 - Note  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
                 with open(self.json_store_path+".tmp", 'w') as json_file:
                     json.dump(data, json_file, indent=4)
                 os.replace(self.json_store_path+".tmp", self.json_store_path)
+                print(f"ln: 433 - Note  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
             except Exception as e:
+                print(f"ln: 435 - Note  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
                 logging.error("Error writing JSON!! (Main JSON file save was skipped) : %s", str(e))
+                print(f"ln: 437 - Note  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
 
             self.needs_write = False
             self.needs_write_urgent = False
+        logging.info("logging Saving JSON.. Done")
         print("Saving JSON.. Done")
 
     # Thread runner, this helps with thread/write issues when there are many operations that want to update the JSON
@@ -434,19 +467,24 @@ class ChangeDetectionStore:
     def save_datastore(self):
 
         while True:
+            print(f"ln: 458 - save_datastore  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ")
             if self.stop_thread:
+                print(f"ln: 460 - save_datastore  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ")
                 print("Shutting down datastore thread")
                 return
 
             if self.needs_write or self.needs_write_urgent:
+                print(f"ln: 465 - save_datastore  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ")
                 self.sync_to_json()
 
             # Once per minute is enough, more and it can cause high CPU usage
             # better here is to use something like self.app.config.exit.wait(1), but we cant get to 'app' from here
             for i in range(120):
+                print(f"ln: 471 - save_datastore  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
                 time.sleep(0.5)
                 if self.stop_thread or self.needs_write_urgent:
                     break
+        print(f"ln: 475 - save_datastore  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/store.py ", file=sys.stderr)
 
     # Go through the datastore path and remove any snapshots that are not mentioned in the index
     # This usually is not used, but can be handy.

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from changedetectionio import queuedWatchMetaData
+import sys
 from copy import deepcopy
 from distutils.util import strtobool
 from feedgen.feed import FeedGenerator
@@ -667,6 +668,8 @@ def changedetection_app(config=None, datastore_o=None):
                     extra_update_obj['tags'] = tag_uuids
 
             datastore.data['watching'][uuid].update(form.data)
+            print(f"ln: 670 - datastore.data  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/__init__.py ", file=sys.stderr)
+            print(f"{type(datastore.data['watching'])=}")
             datastore.data['watching'][uuid].update(extra_update_obj)
 
             if request.args.get('unpause_on_save'):
@@ -1466,7 +1469,11 @@ def changedetection_app(config=None, datastore_o=None):
 
     # @todo handle ctrl break
     ticker_thread = threading.Thread(target=ticker_thread_check_time_launch_checks)
+    #lucky draw?
+    #ticker_thread.daemon = True
     notification_runner_thread = threading.Thread(target=notification_runner)
+    #lucky draw
+    #notification_runner_thread.daemon = True
     ticker_thread.start()
     notification_runner_thread.start()
 
@@ -1510,6 +1517,7 @@ def notification_runner():
     from datetime import datetime
     import json
     while not app.config.exit.is_set():
+        print(f"ln: 1516 - app.config.exit.is_set()  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/__init__.py ", file=sys.stderr)
         try:
             # At the moment only one thread runs (single runner)
             n_object = notification_q.get(block=False)
@@ -1558,9 +1566,11 @@ def ticker_thread_check_time_launch_checks():
     for _ in range(n_workers):
         new_worker = update_worker.update_worker(update_q, notification_q, app, datastore)
         running_update_threads.append(new_worker)
+        #new_worker.daemon = True
         new_worker.start()
 
     while not app.config.exit.is_set():
+        print(f"ln: 1568 - ticker_thread_check_time_launch_checks  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/__init__.py ", file=sys.stderr)
 
         # Get a list of watches by UUID that are currently fetching data
         running_uuids = []
@@ -1655,6 +1665,7 @@ def ticker_thread_check_time_launch_checks():
                     watch.jitter_seconds = 0
 
         # Wait before checking the list again - saves CPU
+        print(f"ln: 1665 - Note  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/__init__.py ")
         time.sleep(1)
 
         # Should be low so we can break this out in testing

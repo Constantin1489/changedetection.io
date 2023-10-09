@@ -23,10 +23,18 @@ datastore = None
 def sigterm_handler(_signo, _stack_frame):
     global app
     global datastore
+    print(f"ln: 25 - Note  /mnt/finalresort/shelf-production/kvm/scripts/xpath2/changedetection.io/changedetectionio/changedetection.py ", file=sys.stderr)
     datastore.stop_thread = True
     datastore.sync_to_json()
+    print('app_config_exit', app.config.exit)
+    print('app_config_exit', dir(app.config.exit))
+    #app.config.exit = True
     app.config.exit.set()
+    print('app_config_exit', app.config.exit.set())
+    print('app_config_exit', dir(app.config.exit.set()))
+    print('Shutdown: Got SIGTERM, DB saved to disk')
     # without this, main() doesn't exit.
+    #raise SystemExit
     sys.exit(0)
 
 def main():
@@ -156,4 +164,5 @@ def main():
     print('exiting?')
     print('exiting?')
     print('exiting?')
+    #sys.exit(0)
 
