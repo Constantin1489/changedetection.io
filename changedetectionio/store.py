@@ -427,6 +427,7 @@ class ChangeDetectionStore:
 
             self.needs_write = False
             self.needs_write_urgent = False
+        print("Saving JSON.. Done")
 
     # Thread runner, this helps with thread/write issues when there are many operations that want to update the JSON
     # by just running periodically in one thread, according to python, dict updates are threadsafe.

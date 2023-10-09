@@ -23,10 +23,11 @@ datastore = None
 def sigterm_handler(_signo, _stack_frame):
     global app
     global datastore
-#    app.config.exit.set()
-    print('Shutdown: Got SIGTERM, DB saved to disk')
+    datastore.stop_thread = True
     datastore.sync_to_json()
-#    raise SystemExit
+    app.config.exit.set()
+    # without this, main() doesn't exit.
+    sys.exit(0)
 
 def main():
     global datastore
@@ -149,5 +150,10 @@ def main():
                                                server_side=True), app)
 
     else:
+        print("########I'M HERE##########")
         eventlet.wsgi.server(eventlet.listen((host, int(port)), s_type), app)
+    print('exiting?')
+    print('exiting?')
+    print('exiting?')
+    print('exiting?')
 

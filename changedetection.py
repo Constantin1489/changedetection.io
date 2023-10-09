@@ -6,6 +6,7 @@
 # Read more https://github.com/dgtlmoon/changedetection.io/wiki
 
 from changedetectionio import changedetection
+import signal
 import multiprocessing
 import sys
 import os
@@ -22,23 +23,40 @@ def sigchld_handler(_signo, _stack_frame):
 
     raise SystemExit
 
+def sigterm_handler(_signo, _stack_frame):
+    raise SystemExit
+def sigint_handler(_signo, _stack_frame):
+    # Is sigint a keyboardinterrupt?
+    raise KeyboardInterrupt
+
 if __name__ == '__main__':
 
     #signal.signal(signal.SIGCHLD, sigchld_handler)
 
     # The only way I could find to get Flask to shutdown, is to wrap it and then rely on the subsystem issuing SIGTERM/SIGKILL
-    parse_process = multiprocessing.Process(target=changedetection.main)
-    parse_process.daemon = True
-    parse_process.start()
-    import time
-
     try:
+        # signal 용 file 만들고 changedetection.py와 changedetectionio/changedetection.py에 import 하기.
+        signal.signal(signal.SIGTERM, sigterm_handler)
+        signal.signal(signal.SIGINT, sigint_handler)
+        parse_process = multiprocessing.Process(target=changedetection.main)
+        parse_process.start()
+        import time
+
         while True:
             time.sleep(1)
             if not parse_process.is_alive():
                 # Process died/crashed for some reason, exit with error set
                 sys.exit(1)
 
+
+    except SystemExit:
+        print("Gracefully exiting")
+        parse_process.terminate()
+        import time
+        while parse_process.exitcode is None:
+            time.sleep(1)
+        print("Gracefully exited")
+        sys.exit(parse_process.exitcode)
     except KeyboardInterrupt:
         #parse_process.terminate() not needed, because this process will issue it to the sub-process anyway
         print ("Exited - CTRL+C")
