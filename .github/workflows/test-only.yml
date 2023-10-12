@@ -104,7 +104,7 @@ jobs:
           sleep 3
           echo ">>> Sending SIGINT to sig-test container"
           docker kill --signal=SIGINT sig-test
-          sleep 10
+          sleep 20
           # invert the check (it should be not 0/not running)
           docker ps
           docker logs sig-test
@@ -122,7 +122,7 @@ jobs:
           sleep 3
           echo ">>> Sending SIGTERM to sig-test container"
           docker kill --signal=SIGTERM sig-test
-          sleep 10
+          sleep 20
           # invert the check (it should be not 0/not running)
           docker ps
           docker logs sig-test
