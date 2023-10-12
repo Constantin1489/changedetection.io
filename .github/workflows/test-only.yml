@@ -111,6 +111,7 @@ jobs:
           docker inspect --format '{{json .State.Running}}' sig-test
           if [ $? -eq 0 ]
           then
+            docker ps -a
             exit 1
           fi
           
@@ -129,6 +130,7 @@ jobs:
           docker inspect --format '{{json .State.Running}}' sig-test
           if [ $? -eq 0 ]
           then
+            docker ps -a
             exit 1
           fi
           
