@@ -108,8 +108,8 @@ jobs:
           # invert the check (it should be not 0/not running)
           docker ps
           docker logs sig-test
-          docker inspect --format '{{json .State.ExitCode}}' sig-test
-          if [ $? -nq 0 ]
+          EXIT_INT=$(docker inspect --format '{{json .State.ExitCode}}' sig-test)
+          if [ ${EXIT_INT} != 0 ]
           then
             exit 1
           fi
@@ -126,8 +126,8 @@ jobs:
           # invert the check (it should be not 0/not running)
           docker ps
           docker logs sig-test
-          docker inspect --format '{{json .State.ExitCode}}' sig-test
-          if [ $? -nq 0 ]
+          EXIT_TERM=$(docker inspect --format '{{json .State.ExitCode}}' sig-test)
+          if [ ${EXIT_TERM} != 0 ]
           then
             exit 1
           fi
