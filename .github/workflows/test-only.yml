@@ -128,6 +128,7 @@ jobs:
           docker inspect --format '{{json .State.Running}}' sig-test
           echo $?
           echo 'adfasdfasfd'
+          exit 1
           
           # @todo - scan the container log to see the right "graceful shutdown" text exists           
           docker rm sig-test
