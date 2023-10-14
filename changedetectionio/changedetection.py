@@ -19,10 +19,14 @@ from . import __version__
 # Only global so we can access it in the signal handler
 app = None
 datastore = None
+is_graceful_shutdown = False
 
 def graceful_shutdown():
     global app
     global datastore
+    global is_graceful_shutdown
+    # print Gracefully exited message at the end.
+    is_graceful_shutdown = True
     print('Gracefully exiting')
     # Stop ChangeDetectionStore thread to avoid conflict with sync_to_json()
     datastore.stop_thread = True
@@ -33,6 +37,8 @@ def graceful_shutdown():
     sys.exit(0)
 
 def sigint_handler(sig, frame):
+    #https://docs.python.org/3/library/signal.html#signal.SIG_IGN
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
     print("Catch - CTRL+C")
     graceful_shutdown()
 
@@ -164,3 +170,5 @@ def main():
     else:
         eventlet.wsgi.server(eventlet.listen((host, int(port)), s_type), app)
 
+    if is_graceful_shutdown:
+        print('graceful shutdown')

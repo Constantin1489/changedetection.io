@@ -108,14 +108,20 @@ jobs:
           # invert the check (it should be not 0/not running)
           docker ps
           docker logs sig-test
-          docker inspect --format '{{json .State.Running}}' sig-test
-          if [ $? -eq 0 ]
+          docker inspect --format '{{json .State.Running}}' sig-test | grep false
+          if [ $? -ne 0 ]
+          then
+            exit 1
+          fi
+          
+          docker logs -f sig-test 2> /dev/null | grep 'graceful shutdown'
+          # both GNU or BSD grep returns 0 if the line was selected
+          if [ $? -ne 0 ]
           then
             docker ps -a
             exit 1
           fi
           
-          # @todo - scan the container log to see the right "graceful shutdown" text exists 
           docker rm sig-test
           
           echo SIGTERM Shutdown request test
@@ -127,14 +133,20 @@ jobs:
           # invert the check (it should be not 0/not running)
           docker ps
           docker logs sig-test
-          docker inspect --format '{{json .State.Running}}' sig-test
-          if [ $? -eq 0 ]
+          docker inspect --format '{{json .State.Running}}' sig-test | grep false
+          if [ $? -ne 0 ]
+          then
+            exit 1
+          fi
+          
+          docker logs -f sig-test 2> /dev/null | grep 'graceful shutdown'
+          # both GNU or BSD grep returns 0 if the line was selected
+          if [ $? -ne 0 ]
           then
             docker ps -a
             exit 1
           fi
           
-          # @todo - scan the container log to see the right "graceful shutdown" text exists           
           docker rm sig-test
 
 #export WEBDRIVER_URL=http://localhost:4444/wd/hub
