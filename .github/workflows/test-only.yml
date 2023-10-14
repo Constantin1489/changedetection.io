@@ -108,8 +108,8 @@ jobs:
           # invert the check (it should be not 0/not running)
           docker ps
           docker logs sig-test
-          docker inspect --format '{{json .State.Running}}' sig-test
-          if [ $? -eq 0 ]
+          docker inspect --format '{{json .State.Running}}' sig-test | grep false
+          if [ $? -ne 0 ]
           then
             exit 1
           fi
@@ -132,8 +132,8 @@ jobs:
           # invert the check (it should be not 0/not running)
           docker ps
           docker logs sig-test
-          docker inspect --format '{{json .State.Running}}' sig-test
-          if [ $? -eq 0 ]
+          docker inspect --format '{{json .State.Running}}' sig-test | grep false
+          if [ $? -ne 0 ]
           then
             exit 1
           fi
