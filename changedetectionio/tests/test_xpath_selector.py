@@ -209,6 +209,8 @@ def test_check_markup_xpath_filter_restriction(client, live_server):
     wait_for_all_checks(client)
 
     res = client.get(url_for("index"))
+    import sys
+    print(f'{res.data=}')
     assert b'unviewed' not in res.data
     res = client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
     assert b'Deleted' in res.data
