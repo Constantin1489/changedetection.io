@@ -138,6 +138,8 @@ def xpath_filter(xpath_filter, html_content, append_pretty_line_formatting=False
         print(f"ln: 136 - {type(element)=}  /mnt/finalresort/shelf-production/kvm/scripts/git_worktree_changedetection/changedetection.io/changedetectionio/html_tools.py ", file=sys.stderr)
         if type(element) == str:
             html_block += element
+        if append_pretty_line_formatting and len(html_block) and (not hasattr( element, 'tag' ) or not element.tag in (['br', 'hr', 'div', 'p'])):
+            html_block += TEXT_FILTER_LIST_LINE_SUFFIX
         # https://lxml.de/api/lxml.etree-module.html#tostring
         # https://lxml.de/api/lxml.etree._Element-class.html
         # https://lxml.de/api/lxml.etree._ElementTree-class.html
@@ -151,8 +153,6 @@ def xpath_filter(xpath_filter, html_content, append_pretty_line_formatting=False
 #
 #
 #
-#        if append_pretty_line_formatting and len(html_block) and (not hasattr( element, 'tag' ) or not element.tag in (['br', 'hr', 'div', 'p'])):
-#            html_block += TEXT_FILTER_LIST_LINE_SUFFIX
 #
 #        if type(element) == etree._ElementStringResult:
 #            print(f"ln: 152 - Note  /mnt/finalresort/shelf-production/kvm/scripts/git_worktree_changedetection/changedetection.io/changedetectionio/html_tools.py ", file=sys.stderr)
