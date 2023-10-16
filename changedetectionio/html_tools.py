@@ -100,11 +100,11 @@ def element_path_tostring(obj):
             return value.upper()
         return value
 
-    elif isinstance(obj, elementpath.XPathFunction):
-        if self.symbol in ('concat', '||'):
-            raise self.error('FOTY0013', f"an argument is a function")
-        else:
-            raise self.error('FOTY0014', f"{obj.label!r} has no string value")
+#    elif isinstance(obj, elementpath.XPathFunction):
+#        if self.symbol in ('concat', '||'):
+#            raise self.error('FOTY0013', f"an argument is a function")
+#        else:
+#            raise self.error('FOTY0014', f"{obj.label!r} has no string value")
 
     return str(obj)
 
