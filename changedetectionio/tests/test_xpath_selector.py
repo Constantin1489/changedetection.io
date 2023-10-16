@@ -161,6 +161,7 @@ def test_check_xpath_text_function_utf8(client, live_server):
         follow_redirects=True
     )
 
+    print(f'{res.data}')
     assert b'<div class="">Stock Alert (UK): RPi CM4' in res.data
     assert b'<div class="">Stock Alert (UK): Big monitor' in res.data
 
