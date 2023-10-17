@@ -68,7 +68,11 @@ def element_removal(selectors: List[str], html_content):
     return subtractive_css_selector(selector, html_content)
 
 
-def element_path_tostring(obj):
+def elementpath_tostring(obj):
+    """
+    # https://github.com/sissaschool/elementpath/blob/dfcc2fd3d6011b16e02bf30459a7924f547b47d0/elementpath/xpath_tokens.py#L1038
+    """
+
     import elementpath
     from decimal import Decimal
     import math
@@ -150,13 +154,12 @@ def xpath_filter(xpath_filter, html_content, append_pretty_line_formatting=False
         # https://lxml.de/api/lxml.etree-module.html#tostring
         # https://lxml.de/api/lxml.etree._Element-class.html
         # https://lxml.de/api/lxml.etree._ElementTree-class.html
-        elif issubclass(type(element),etree._Element) or issubclass(type(element), etree._ElementTree):
+        elif issubclass(type(element), etree._Element) or issubclass(type(element), etree._ElementTree):
             print(f"ln: 136 - {type(element)=}  /mnt/finalresort/shelf-production/kvm/scripts/git_worktree_changedetection/changedetection.io/changedetectionio/html_tools.py ", file=sys.stderr)
             print(f"ln: 136 - {dir(element)=}  /mnt/finalresort/shelf-production/kvm/scripts/git_worktree_changedetection/changedetection.io/changedetectionio/html_tools.py ", file=sys.stderr)
             html_block += etree.tostring(element, pretty_print=True).decode('utf-8')
-            #html_block += element_path_tostring(element)
         else:
-            html_block += element_path_tostring(element)
+            html_block += elementpath_tostring(element)
 #
 #
 #
