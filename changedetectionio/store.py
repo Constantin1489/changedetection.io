@@ -126,7 +126,7 @@ class ChangeDetectionStore:
         save_data_thread = threading.Thread(target=self.save_datastore).start()
 
     def set_last_viewed(self, uuid, timestamp):
-        logging.debug("Setting watch UUID: {} last viewed to {}".format(uuid, int(timestamp)))
+        logger.debug("Setting watch UUID: {} last viewed to {}".format(uuid, int(timestamp)))
         self.data['watching'][uuid].update({'last_viewed': int(timestamp)})
         self.needs_write = True
 
@@ -319,7 +319,7 @@ class ChangeDetectionStore:
             })
 
             new_uuid = new_watch['uuid']
-            logging.debug("Added URL {} - {}".format(url, new_uuid))
+            logger.debug("Added URL {} - {}".format(url, new_uuid))
 
             for k in ['uuid', 'history', 'last_checked', 'last_changed', 'newest_history_key', 'previous_md5', 'viewed']:
                 if k in apply_extras:

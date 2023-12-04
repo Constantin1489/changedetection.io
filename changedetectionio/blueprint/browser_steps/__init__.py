@@ -140,7 +140,7 @@ def construct_blueprint(datastore: ChangeDetectionStore):
 
             if not browsersteps_playwright_browser_interface:
                 logger.info("Starting connection with playwright")
-                logging.debug("browser_steps.py connecting")
+                logger.debug("browser_steps.py connecting")
 
                 global browsersteps_playwright_browser_interface_context
                 from . import nonContext
