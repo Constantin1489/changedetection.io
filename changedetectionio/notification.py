@@ -1,3 +1,4 @@
+from loguru import logger
 import apprise
 from jinja2 import Environment, BaseLoader
 from apprise import NotifyFormat
