@@ -9,6 +9,7 @@ import eventlet
 import eventlet.wsgi
 import getopt
 from loguru import logger
+logger.add()
 import os
 import signal
 import socket
