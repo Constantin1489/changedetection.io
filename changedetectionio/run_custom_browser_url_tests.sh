@@ -6,7 +6,7 @@
 set -x
 
 # A extra browser is configured, but we never chose to use it, so it should NOT show in the logs
-docker run --rm -e "PLAYWRIGHT_DRIVER_URL=ws://browserless:3000" --network changedet-network test-changedetectionio  bash -c 'cd changedetectionio;pytest tests/custom_browser_url/test_custom_browser_url.py::test_request_not_via_custom_browser_url'
+docker run --rm -e "PLAYWRIGHT_DRIVER_URL=ws://browserless:3000" --network changedet-network test-changedetectionio  bash -c 'cd changedetectionio;pytest -s -v tests/custom_browser_url/test_custom_browser_url.py::test_request_not_via_custom_browser_url'
 docker logs browserless-custom-url &>log.txt
 grep 'custom-browser-search-string=1' log.txt
 if [ $? -ne 1 ]
@@ -24,7 +24,7 @@ then
 fi
 
 # Special connect string should appear in the custom-url container, but not in the 'default' one
-docker run --rm -e "PLAYWRIGHT_DRIVER_URL=ws://browserless:3000" --network changedet-network test-changedetectionio  bash -c 'cd changedetectionio;pytest tests/custom_browser_url/test_custom_browser_url.py::test_request_via_custom_browser_url'
+docker run --rm -e "PLAYWRIGHT_DRIVER_URL=ws://browserless:3000" --network changedet-network test-changedetectionio  bash -c 'cd changedetectionio;pytest -s -v tests/custom_browser_url/test_custom_browser_url.py::test_request_via_custom_browser_url'
 docker logs browserless-custom-url &>log.txt
 grep 'custom-browser-search-string=1' log.txt
 if [ $? -ne 0 ]
