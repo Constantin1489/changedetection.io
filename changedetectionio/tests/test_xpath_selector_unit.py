@@ -134,7 +134,7 @@ branches_to_visit = """<?xml version="1.0" ?>
     ("manager[@name = 'Godot']/branch[ . = 'Stalsk12'] <<  manager[1]/branch[1]", "false"),
     ("//manager[@name = 'Godot']/branch[ . = 'Stalsk12'] <<  //manager[1]/branch[1]", "false"),
     ("manager[@name = 'Godot']/branch[ . = 'Stalsk12']  >>  manager[1]/branch[1]", "true"),
-    ("//manager[@name = 'Godot']/branch[ . = 'Stalsk12'] >>  //manager[1]/branch[1]", "false"),
+    ("//manager[@name = 'Godot']/branch[ . = 'Stalsk12'] >>  //manager[1]/branch[1]", "true"),
     ("manager[@name = 'Godot']/branch[ . = 'Stalsk12'] is manager[@name = 'Freya']/branch[ . = 'Stalsk12']", "false"),
     ("//manager[@name = 'Godot']/branch[ . = 'Stalsk12'] is //manager[@name = 'Freya']/branch[ . = 'Stalsk12']", "false"),
     ("manager[1]/@name || manager[2]/@name", "GodotFreya"),
