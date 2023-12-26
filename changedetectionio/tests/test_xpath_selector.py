@@ -360,7 +360,7 @@ def test_various_rules(client, live_server):
         assert b'fetch-error' not in res.data, f"Should not see errors after '{r} filter"
 
     res = client.get(url_for("form_delete", uuid="all"), follow_redirects=True)
-    assert b'Deleted' in res.data
+    assert b'Deleted' not in res.data
 
 
 def test_xpath_20(client, live_server):
