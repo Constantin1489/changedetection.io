@@ -22,14 +22,14 @@ docker run --network changedet-network \
   --rm \
   -e "SOCKSTEST=proxiesjson" \
   test-changedetectionio \
-  bash -c 'cd changedetectionio && pytest -s -v tests/proxy_socks5/test_socks5_proxy_sources.py'
+  bash -c 'cd changedetectionio && pytest tests/proxy_socks5/test_socks5_proxy_sources.py'
 
 # SOCKS5 related - by manually entering in UI
 docker run --network changedet-network \
   --rm \
   -e "SOCKSTEST=manual" \
   test-changedetectionio \
-  bash -c 'cd changedetectionio && pytest -s -v tests/proxy_socks5/test_socks5_proxy.py'
+  bash -c 'cd changedetectionio && pytest tests/proxy_socks5/test_socks5_proxy.py'
 
 # SOCKS5 related - test from proxies.json via playwright - NOTE- PLAYWRIGHT DOESNT SUPPORT AUTHENTICATING PROXY
 docker run --network changedet-network \
@@ -38,7 +38,7 @@ docker run --network changedet-network \
   -e "PLAYWRIGHT_DRIVER_URL=ws://browserless:3000" \
   --rm \
   test-changedetectionio \
-  bash -c 'cd changedetectionio && pytest -s -v tests/proxy_socks5/test_socks5_proxy_sources.py'
+  bash -c 'cd changedetectionio && pytest tests/proxy_socks5/test_socks5_proxy_sources.py'
 
 echo "socks5 server logs"
 docker logs socks5proxy
@@ -58,7 +58,7 @@ docker run --network changedet-network -d \
 docker run --network changedet-network \
   -v `pwd`/tests/proxy_list/proxies.json-example:/app/changedetectionio/test-datastore/proxies.json \
   test-changedetectionio \
-  bash -c 'cd changedetectionio && pytest -s -v tests/proxy_list/test_multiple_proxy.py'
+  bash -c 'cd changedetectionio && pytest tests/proxy_list/test_multiple_proxy.py'
 
 
 ## Should be a request in the default "first" squid
@@ -81,7 +81,7 @@ fi
 # Test the UI configurable proxies
 docker run --network changedet-network \
   test-changedetectionio \
-  bash -c 'cd changedetectionio && pytest -s -v tests/proxy_list/test_select_custom_proxy.py'
+  bash -c 'cd changedetectionio && pytest tests/proxy_list/test_select_custom_proxy.py'
 
 
 # Should see a request for one.changedetection.io in there
@@ -95,7 +95,7 @@ fi
 # Test "no-proxy" option
 docker run --network changedet-network \
   test-changedetectionio \
-  bash -c 'cd changedetectionio && pytest -s -v tests/proxy_list/test_noproxy.py'
+  bash -c 'cd changedetectionio && pytest tests/proxy_list/test_noproxy.py'
 
 # We need to handle grep returning 1
 set +e
