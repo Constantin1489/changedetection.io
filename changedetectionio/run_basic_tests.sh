@@ -14,7 +14,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 find tests/test_*py -type f|while read test_name
 do
   echo "TEST RUNNING $test_name"
-  pytest $test_name
+  pytest -s -v $test_name
 done
 
 echo "RUNNING WITH BASE_URL SET"
