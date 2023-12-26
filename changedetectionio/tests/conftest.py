@@ -72,3 +72,13 @@ def caplog(caplog: LogCaptureFixture):
     yield caplog
     logger.remove(handler_id)
 
+import pytest
+from loguru import logger
+
+@pytest.fixture
+def reportlog(pytestconfig):
+    logging_plugin = pytestconfig.pluginmanager.getplugin("logging-plugin")
+    handler_id = logger.add(logging_plugin.report_handler, format="{message}")
+    yield
+    logger.remove(handler_id)
+
