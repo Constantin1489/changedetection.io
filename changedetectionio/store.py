@@ -445,9 +445,9 @@ class ChangeDetectionStore:
 
         while True:
             if self.stop_thread:
-                import sys
-                logger.remove()
-                logger.add(sys.stderr)
+                #import sys
+                #logger.remove()
+                #logger.add(sys.stderr)
                 logger.critical("Shutting down datastore thread")
                 return
 
