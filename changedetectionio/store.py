@@ -445,6 +445,8 @@ class ChangeDetectionStore:
 
         while True:
             if self.stop_thread:
+                logger.remove()
+                logger.add(sys.stderr, level=logger_level)
                 logger.critical("Shutting down datastore thread")
                 return
 
