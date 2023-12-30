@@ -9,6 +9,7 @@ import os
 from changedetectionio import diff
 
 #https://github.com/Delgan/loguru/issues/616
+from loguru import logger
 from contextlib import contextmanager
 @contextmanager
 def capture_logs(level="INFO", format="{level}:{name}:{message}"):
