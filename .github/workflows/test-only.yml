@@ -50,10 +50,12 @@ jobs:
       - name: Test built container with pytest
         run: |
           # Unit tests
+          echo "run unittest module"
           docker run test-changedetectionio  bash -c 'python3 -m unittest changedetectionio.tests.unit.test_notification_diff'
           docker run test-changedetectionio  bash -c 'python3 -m unittest changedetectionio.tests.unit.test_watch_model'
           
           # All tests
+          echo "run pytest module"
           docker run --network changedet-network  test-changedetectionio  bash -c 'cd changedetectionio && ./run_basic_tests.sh'
 
       - name: Test built container selenium+browserless/playwright
