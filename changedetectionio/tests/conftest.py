@@ -11,7 +11,7 @@ import os
 
 global app
 
-
+from loguru import logger
 @pytest.fixture
 def reportlog(pytestconfig):
     logging_plugin = pytestconfig.pluginmanager.getplugin("logging-plugin")
