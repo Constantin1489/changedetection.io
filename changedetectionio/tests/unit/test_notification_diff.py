@@ -8,6 +8,16 @@ import os
 
 from changedetectionio import diff
 
+#https://github.com/Delgan/loguru/issues/616
+from contextlib import contextmanager
+@contextmanager
+def capture_logs(level="INFO", format="{level}:{name}:{message}"):
+    """Capture loguru-based logs."""
+    output = []
+    handler_id = logger.add(output.append, level=level, format=format)
+    yield output
+    logger.remove(handler_id)
+
 # mostly
 class TestDiffBuilder(unittest.TestCase):
 
