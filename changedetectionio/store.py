@@ -446,7 +446,10 @@ class ChangeDetectionStore:
         while True:
             if self.stop_thread:
                 # Suppressing "Logging error in Loguru Handler #0" during CICD.
-                # Not a meaningful feature for usage.
+                # Not a meaningful difference for a real use-case just for CICD.
+                # the side effect is a "Shutting down datastore thread" message
+                # at the end of each test.
+                # But still more looking better.
                 import sys
                 logger.remove()
                 logger.add(sys.stderr)
