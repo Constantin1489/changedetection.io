@@ -2,6 +2,7 @@ import apprise
 from jinja2 import Environment, BaseLoader
 from apprise import NotifyFormat
 import json
+from loguru import logger
 
 valid_tokens = {
     'base_url': '',
@@ -143,7 +144,7 @@ def process_notification(n_object, datastore):
         apobj = apprise.Apprise(debug=True, asset=asset)
         url = url.strip()
         if len(url):
-            print(">> Process Notification: AppRise notifying {}".format(url))
+            logger.info(f">> Process Notification: AppRise notifying '{url}'")
             with apprise.LogCapture(level=apprise.logging.DEBUG) as logs:
                 # Re 323 - Limit discord length to their 2000 char limit total or it wont send.
                 # Because different notifications may require different pre-processing, run each sequentially :(
@@ -221,13 +222,14 @@ def process_notification(n_object, datastore):
 
 
 # Notification title + body content parameters get created here.
+# ( Where we prepare the tokens in the notification to be replaced with actual values )
 def create_notification_parameters(n_object, datastore):
     from copy import deepcopy
 
     # in the case we send a test notification from the main settings, there is no UUID.
     uuid = n_object['uuid'] if 'uuid' in n_object else ''
 
-    if uuid != '':
+    if uuid:
         watch_title = datastore.data['watching'][uuid].get('title', '')
         tag_list = []
         tags = datastore.get_all_tags_for_watch(uuid)
@@ -255,7 +257,7 @@ def create_notification_parameters(n_object, datastore):
     tokens.update(
         {
             'base_url': base_url,
-            'current_snapshot': n_object['current_snapshot'] if 'current_snapshot' in n_object else '',
+            'current_snapshot': n_object.get('current_snapshot', ''),
             'diff': n_object.get('diff', ''),  # Null default in the case we use a test
             'diff_added': n_object.get('diff_added', ''),  # Null default in the case we use a test
             'diff_full': n_object.get('diff_full', ''),  # Null default in the case we use a test
