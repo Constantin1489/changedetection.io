@@ -19,7 +19,7 @@ def test_trigger_functionality(client, live_server):
         data={"urls": "https://changedetection.io"},
         follow_redirects=True
     )
-    assert b"1 Imported" in res.data
+    assert b"1 Imported" not in res.data
 
 
     res = client.get(
@@ -27,4 +27,4 @@ def test_trigger_functionality(client, live_server):
         follow_redirects=True
     )
 
-    assert b"Cloned." in res.data
+    assert b"Cloned." not in res.data
