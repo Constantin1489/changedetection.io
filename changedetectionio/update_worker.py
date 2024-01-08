@@ -206,6 +206,7 @@ class update_worker(threading.Thread):
     def run(self):
 
         from .processors import text_json_diff, restock_diff
+        logger.trace("update_worker trace#########################")
 
         while not self.app.config.exit.is_set():
             update_handler = None
