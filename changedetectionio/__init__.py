@@ -2,7 +2,7 @@
 
 # Read more https://github.com/dgtlmoon/changedetection.io/wiki
 
-__version__ = '0.45.8.1'
+__version__ = '0.45.10'
 
 from distutils.util import strtobool
 from json.decoder import JSONDecodeError
@@ -31,7 +31,7 @@ def sigshutdown_handler(_signo, _stack_frame):
     name = signal.Signals(_signo).name
     logger.critical(f'Shutdown: Got Signal - {name} ({_signo}), Saving DB to disk and calling shutdown')
     datastore.sync_to_json()
-    logger.success(f'Sync JSON to disk complete.')
+    logger.success('Sync JSON to disk complete.')
     # This will throw a SystemExit exception, because eventlet.wsgi.server doesn't know how to deal with it.
     # Solution: move to gevent or other server in the future (#2014)
     datastore.stop_thread = True
@@ -81,7 +81,7 @@ def main():
             datastore_path = arg
 
         if opt == '-6':
-            logger.critical("Enabling IPv6 listen support")
+            logger.success("Enabling IPv6 listen support")
             ipv6_enabled = True
 
         # Cleanup (remove text files that arent in the index)
@@ -113,15 +113,17 @@ def main():
             os.mkdir(app_config['datastore_path'])
         else:
             logger.critical(
-                "ERROR: Directory path for the datastore '{}' does not exist, cannot start, please make sure the directory exists or specify a directory with the -d option.\n"
-                "Or use the -C parameter to create the directory.".format(app_config['datastore_path']))
+                f"ERROR: Directory path for the datastore '{app_config['datastore_path']}'"
+                f" does not exist, cannot start, please make sure the"
+                f" directory exists or specify a directory with the -d option.\n"
+                f"Or use the -C parameter to create the directory.")
             sys.exit(2)
 
     try:
         datastore = store.ChangeDetectionStore(datastore_path=app_config['datastore_path'], version_tag=__version__)
     except JSONDecodeError as e:
         # Dont' start if the JSON DB looks corrupt
-        logger.critical("ERROR: JSON DB or Proxy List JSON at '{}' appears to be corrupt, aborting".format(app_config['datastore_path']))
+        logger.critical(f"ERROR: JSON DB or Proxy List JSON at '{app_config['datastore_path']}' appears to be corrupt, aborting.")
         logger.critical(str(e))
         return
 
@@ -161,7 +163,7 @@ def main():
     #         proxy_set_header X-Forwarded-Prefix /app;
 
     if os.getenv('USE_X_SETTINGS'):
-        logger.debug("USE_X_SETTINGS is ENABLED\n")
+        logger.info("USE_X_SETTINGS is ENABLED\n")
         from werkzeug.middleware.proxy_fix import ProxyFix
         app.wsgi_app = ProxyFix(app.wsgi_app, x_prefix=1, x_host=1)
 
