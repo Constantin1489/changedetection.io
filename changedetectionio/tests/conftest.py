@@ -41,8 +41,15 @@ def app(request):
     app_config = {'datastore_path': datastore_path, 'disable_checkver' : True}
     cleanup(app_config['datastore_path'])
 
+    # Set via Dockerfile ARG and '--build-arg' in test-only.yml
+    if os.getenv("LOGGER_LEVEL"):
+        logger_level = os.getenv("LOGGER_LEVEL")
+    else:
+        # just in case.
+        logger_level = 'DEBUG'
+
     logger.remove()
-    logger.add(sys.stderr, level='TRACE')
+    logger.add(sys.stderr, level=logger_level)
 
     datastore = store.ChangeDetectionStore(datastore_path=app_config['datastore_path'], include_default_watches=False)
     app = changedetection_app(app_config, datastore)
