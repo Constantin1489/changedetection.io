@@ -46,8 +46,8 @@ def app(request):
     if os.getenv("LOGGER_LEVEL"):
         logger_level = os.getenv("LOGGER_LEVEL")
     else:
-        # just in case.
-        logger_level = 'DEBUG'
+        # a default logger level
+        logger_level = 'TRACE'
 
     from loguru import logger
     logger.remove()
