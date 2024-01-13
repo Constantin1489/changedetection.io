@@ -38,7 +38,7 @@ jobs:
       - name: Build changedetection.io container for testing
         run: |         
           # Build a changedetection.io container and start testing inside
-          docker build . -t test-changedetectionio
+          docker build --build-arg LOGGER_LEVEL=TRACE -t test-changedetectionio .
           # Debug info
           docker run test-changedetectionio  bash -c 'pip list'
 

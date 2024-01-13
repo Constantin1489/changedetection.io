@@ -40,6 +40,10 @@ def app(request):
 
     app_config = {'datastore_path': datastore_path, 'disable_checkver' : True}
     cleanup(app_config['datastore_path'])
+
+    logger.remove()
+    logger.add(sys.stderr, level='TRACE')
+
     datastore = store.ChangeDetectionStore(datastore_path=app_config['datastore_path'], include_default_watches=False)
     app = changedetection_app(app_config, datastore)
 

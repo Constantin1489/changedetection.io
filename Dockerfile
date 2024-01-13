@@ -4,6 +4,11 @@ FROM python:3.11-slim-bookworm as builder
 # See `cryptography` pin comment in requirements.txt
 ARG CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
+# Github Action test purpose.
+# On production, it is effectively LOGGER_LEVEL=''.
+ARG LOGGER_LEVEL
+ENV LOGGER_LEVEL "$LOGGER_LEVEL"
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
     gcc \

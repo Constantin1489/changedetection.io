@@ -223,6 +223,8 @@ def changedetection_app(config=None, datastore_o=None):
     app.secret_key = init_app_secret(config['datastore_path'])
 
 
+    logger.trace("TRACE log is enabled")
+
     watch_api.add_resource(api_v1.WatchSingleHistory,
                            '/api/v1/watch/<string:uuid>/history/<string:timestamp>',
                            resource_class_kwargs={'datastore': datastore, 'update_q': update_q})

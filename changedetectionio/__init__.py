@@ -65,7 +65,13 @@ def main():
 
     create_datastore_dir = False
 
+    # Set a default logger level
     logger_level = 'DEBUG'
+    # Set logger level via shell env variable
+    # used: Dockerfile for CICD
+    # To set logger level for pytest, see the app function in tests/conftest.py
+    if os.getenv("LOGGER_LEVEL"):
+        logger_level = os.getenv("LOGGER_LEVEL")
 
     for opt, arg in opts:
         if opt == '-s':
