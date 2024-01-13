@@ -48,6 +48,7 @@ def app(request):
         # just in case.
         logger_level = 'DEBUG'
 
+    from loguru import logger
     logger.remove()
     logger.add(sys.stderr, level=logger_level)
 
