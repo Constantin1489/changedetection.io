@@ -1623,6 +1623,7 @@ def ticker_thread_check_time_launch_checks():
 
     recheck_time_minimum_seconds = int(os.getenv('MINIMUM_SECONDS_RECHECK_TIME', 20))
     logger.debug(f"System env MINIMUM_SECONDS_RECHECK_TIME {recheck_time_minimum_seconds}")
+    logger.debug(f"{os.getenv('LOGGER_LEVEL')=}")
     logger.trace("TRACE is enabled")
 
     # Spin up Workers that do the fetching
