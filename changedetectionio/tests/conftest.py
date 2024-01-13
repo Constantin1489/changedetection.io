@@ -42,11 +42,11 @@ def app(request):
     app_config = {'datastore_path': datastore_path, 'disable_checkver' : True}
     cleanup(app_config['datastore_path'])
 
-    # Set via Dockerfile ARG and '--build-arg' in test-only.yml
+    # This is not assignable via ARG or ENV but test-only.yml
     if os.getenv("LOGGER_LEVEL"):
         logger_level = os.getenv("LOGGER_LEVEL")
     else:
-        # a default logger level
+        # a default logger level for pytest
         logger_level = 'TRACE'
 
     from loguru import logger
