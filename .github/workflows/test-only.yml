@@ -56,7 +56,7 @@ jobs:
           
           # All tests
           echo "run test with pytest"
-          docker run --network changedet-network  test-changedetectionio  bash -c 'cd changedetectionio && ./run_basic_tests.sh'
+          docker run -e LOGGER_LEVEL=DEBUG --network changedet-network  test-changedetectionio   bash -c 'cd changedetectionio && ./run_basic_tests.sh'
 
       - name: Test built container selenium+browserless/playwright
         run: |
