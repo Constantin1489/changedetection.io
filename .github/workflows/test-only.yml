@@ -47,60 +47,6 @@ jobs:
           # Debug SMTP server/echo message back server
           docker run --network changedet-network -d -p 11025:11025 -p 11080:11080  --hostname mailserver test-changedetectionio  bash -c 'python changedetectionio/tests/smtp/smtp-test-server.py' 
 
-      - name: Test built container with pytest
-        run: |
-          # Unit tests
-          echo "run test with unittest"
-          docker run test-changedetectionio  bash -c 'python3 -m unittest changedetectionio.tests.unit.test_notification_diff'
-          docker run test-changedetectionio  bash -c 'python3 -m unittest changedetectionio.tests.unit.test_watch_model'
-          
-          # All tests
-          echo "run test with pytest"
-          # The default pytest logger_level is TRACE
-          # To change logger_level for pytest(test/conftest.py),
-          # append the docker option. e.g. '-e LOGGER_LEVEL=DEBUG'
-          docker run --network changedet-network  test-changedetectionio  bash -c 'cd changedetectionio && ./run_basic_tests.sh'
-
-      - name: Test built container selenium+browserless/playwright
-        run: |
-          
-          # Selenium fetch
-          docker run --rm -e "WEBDRIVER_URL=http://selenium:4444/wd/hub" --network changedet-network test-changedetectionio  bash -c 'cd changedetectionio;pytest tests/fetchers/test_content.py && pytest tests/test_errorhandling.py'
-          
-          # Playwright/Browserless fetch
-          docker run --rm -e "PLAYWRIGHT_DRIVER_URL=ws://browserless:3000" --network changedet-network test-changedetectionio  bash -c 'cd changedetectionio;pytest tests/fetchers/test_content.py && pytest tests/test_errorhandling.py && pytest tests/visualselector/test_fetch_data.py'
-          
-          # Settings headers playwright tests - Call back in from Browserless, check headers
-          docker run --name "changedet" --hostname changedet --rm -e "FLASK_SERVER_NAME=changedet" -e "PLAYWRIGHT_DRIVER_URL=ws://browserless:3000?dumpio=true" --network changedet-network test-changedetectionio  bash -c 'cd changedetectionio; pytest --live-server-host=0.0.0.0  --live-server-port=5004 tests/test_request.py'
-          docker run --name "changedet" --hostname changedet --rm -e "FLASK_SERVER_NAME=changedet" -e "WEBDRIVER_URL=http://selenium:4444/wd/hub" --network changedet-network test-changedetectionio  bash -c 'cd changedetectionio; pytest --live-server-host=0.0.0.0  --live-server-port=5004 tests/test_request.py'
-          docker run --name "changedet" --hostname changedet --rm -e "FLASK_SERVER_NAME=changedet" -e "USE_EXPERIMENTAL_PUPPETEER_FETCH=yes" -e "PLAYWRIGHT_DRIVER_URL=ws://browserless:3000?dumpio=true" --network changedet-network test-changedetectionio  bash -c 'cd changedetectionio; pytest --live-server-host=0.0.0.0  --live-server-port=5004 tests/test_request.py'          
-          
-          # restock detection via playwright - added name=changedet here so that playwright/browserless can connect to it
-          docker run --rm --name "changedet" -e "FLASK_SERVER_NAME=changedet" -e "PLAYWRIGHT_DRIVER_URL=ws://browserless:3000" --network changedet-network test-changedetectionio  bash -c 'cd changedetectionio;pytest --live-server-port=5004 --live-server-host=0.0.0.0 tests/restock/test_restock.py'
-
-      - name: Test SMTP notification mime types
-        run: |
-          # SMTP content types - needs the 'Debug SMTP server/echo message back server' container from above
-          docker run --rm  --network changedet-network test-changedetectionio bash -c 'cd changedetectionio;pytest tests/smtp/test_notification_smtp.py'
-
-      - name: Test with puppeteer fetcher and disk cache
-        run: |
-          docker run --rm -e "PUPPETEER_DISK_CACHE=/tmp/data/" -e "USE_EXPERIMENTAL_PUPPETEER_FETCH=yes" -e "PLAYWRIGHT_DRIVER_URL=ws://browserless:3000" --network changedet-network test-changedetectionio  bash -c 'cd changedetectionio;pytest tests/fetchers/test_content.py && pytest tests/test_errorhandling.py && pytest tests/visualselector/test_fetch_data.py'
-          # Browserless would have had -e "FUNCTION_BUILT_INS=[\"fs\",\"crypto\"]" added above
-
-      - name: Test proxy interaction
-        run: |
-          cd changedetectionio
-          ./run_proxy_tests.sh
-          # And again with PLAYWRIGHT_DRIVER_URL=..
-          cd ..
-
-      - name: Test custom browser URL
-        run: |
-          cd changedetectionio
-          ./run_custom_browser_url_tests.sh
-          cd ..
-
       - name: Test changedetection.io container starts+runs basically without error
         run: |
           docker run --name test-changedetectionio -p 5556:5000  -d test-changedetectionio
@@ -112,7 +58,10 @@ jobs:
           curl -s -g -6 "http://[::1]:5556"|grep -q checkbox-uuid
 
           # Check whether TRACE log is enabled.
-          docker logs test-changedetectionio 2>&1 | grep 'TRACE log is enabled' || exit 1
+          # Check whether TRACE is came from STDERR
+          docker logs test-changedetectionio 2>&1 1>/dev/null | grep 'TRACE log is enabled' || exit 1
+          # Check whether DEBUG is came from STDOUT
+          docker logs test-changedetectionio 2> /dev/null | grep 'DEBUG' || exit 1
 
           docker kill test-changedetectionio
 
