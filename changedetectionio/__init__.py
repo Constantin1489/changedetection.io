@@ -2,7 +2,7 @@
 
 # Read more https://github.com/dgtlmoon/changedetection.io/wiki
 
-__version__ = '0.45.12'
+__version__ = '0.45.13'
 
 from gevent import monkey
 monkey.patch_all(thread=False)
