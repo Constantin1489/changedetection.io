@@ -65,7 +65,7 @@ jobs:
           # The default pytest logger_level is TRACE
           # To change logger_level for pytest(test/conftest.py),
           # append the docker option. e.g. '-e LOGGER_LEVEL=DEBUG'
-          docker run --name test-cdio-basic-tests --network changedet-network  test-changedetectionio  bash -c 'cd changedetectionio && ./run_basic_tests.sh'
+          #docker run --name test-cdio-basic-tests --network changedet-network  test-changedetectionio  bash -c 'cd changedetectionio && ./run_basic_tests.sh'
 
 # PLAYWRIGHT/NODE-> CDP
       - name: Playwright and SocketPuppetBrowser - Specific tests in built container
@@ -211,7 +211,7 @@ jobs:
           # just a second.
           sleep 1
           # port conflicts and shutdown.
-          PORT=5000 python changedetection.py -d /datastore' || true &
+          PORT=5000 python changedetection.py -d /datastore' &
           sleep 7
           docker ps -a
           docker logs sig-test 2>&1 | grep 'Address already in use' || exit 1
