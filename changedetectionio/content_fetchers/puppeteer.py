@@ -226,6 +226,8 @@ class fetcher(Fetcher):
 
         # This will work in 3.10 but not >= 3.11 because 3.11 wants tasks only
         try:
+            import eventlet.hubs
+            eventlet.hubs.use_hub("eventlet.hubs.asyncio")
             asyncio.run(asyncio.wait_for(self.main(
                 url=url,
                 timeout=timeout,
