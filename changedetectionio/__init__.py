@@ -181,8 +181,6 @@ def main():
         app.wsgi_app = ProxyFix(app.wsgi_app, x_prefix=1, x_host=1)
 
     s_type = socket.AF_INET6 if ipv6_enabled else socket.AF_INET
-    import eventlet.hubs
-    eventlet.hubs.use_hub("eventlet.hubs.asyncio")
 
     if ssl_mode:
         # @todo finalise SSL config, but this should get you in the right direction if you need it.
