@@ -39,6 +39,8 @@ def sigshutdown_handler(_signo, _stack_frame):
     sys.exit()
 
 def main():
+    import eventlet.hubs
+    eventlet.hubs.use_hub("eventlet.hubs.asyncio")
     global datastore
     global app
 
