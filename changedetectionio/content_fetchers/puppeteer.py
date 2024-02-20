@@ -222,7 +222,8 @@ class fetcher(Fetcher):
             current_include_filters=None, is_binary=False):
 
         # This will work in 3.10 but not >= 3.11 because 3.11 wants tasks only
-        asyncio.run(self.main(
+        from eventlet.asyncio import spawn_for_awaitable
+        gthread = spawn_for_awaitable(self.main(
             url=url,
             timeout=timeout,
             request_headers=request_headers,
@@ -232,3 +233,4 @@ class fetcher(Fetcher):
             current_include_filters=current_include_filters,
             is_binary=is_binary
         ))
+        gthread.wait()
