@@ -50,7 +50,7 @@ def set_modified_response():
 
 # Handle utf-8 charset replies https://github.com/dgtlmoon/changedetection.io/pull/613
 def test_check_xpath_filter_utf8(client, live_server):
-    filter = '//item/*[self::description]'
+    filter = 'xpath1://item/*[self::description]'
 
     d = '''<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
@@ -106,7 +106,7 @@ def test_check_xpath_filter_utf8(client, live_server):
 
 # Handle utf-8 charset replies https://github.com/dgtlmoon/changedetection.io/pull/613
 def test_check_xpath_text_function_utf8(client, live_server):
-    filter = '//item/title/text()'
+    filter = 'xpath1://item/title/text()'
 
     d = '''<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
@@ -169,7 +169,7 @@ def test_check_xpath_text_function_utf8(client, live_server):
 
 
 def test_check_markup_xpath_filter_restriction(client, live_server):
-    xpath_filter = "//*[contains(@class, 'sametext')]"
+    xpath_filter = "xpath1://*[contains(@class, 'sametext')]"
 
     set_original_response()
 
@@ -227,7 +227,7 @@ def test_xpath_validation(client, live_server):
 
     res = client.post(
         url_for("edit_page", uuid="first"),
-        data={"include_filters": "/something horrible", "url": test_url, "tags": "", "headers": "", 'fetch_backend': "html_requests"},
+        data={"include_filters": "xpath1:/something horrible", "url": test_url, "tags": "", "headers": "", 'fetch_backend': "html_requests"},
         follow_redirects=True
     )
     assert b"is not a valid XPath expression" in res.data
@@ -359,7 +359,7 @@ def test_check_with_prefix_include_filters(client, live_server):
 
     res = client.post(
         url_for("edit_page", uuid="first"),
-        data={"include_filters": "xpath://*[contains(@class, 'sametext')]", "url": test_url, "tags": "", "headers": "",
+        data={"include_filters": "xpath1://*[contains(@class, 'sametext')]", "url": test_url, "tags": "", "headers": "",
               'fetch_backend': "html_requests"},
         follow_redirects=True
     )
@@ -407,7 +407,7 @@ def test_various_rules(client, live_server):
     assert b"1 Imported" in res.data
     wait_for_all_checks(client)
 
-    for r in ['//div', '//a', 'xpath://div', 'xpath://a']:
+    for r in ['//div', '//a', 'xpath1://div', 'xpath1://a' ,'xpath://div', 'xpath://a']:
         res = client.post(
             url_for("edit_page", uuid="first"),
             data={"include_filters": r,
