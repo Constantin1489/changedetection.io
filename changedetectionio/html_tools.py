@@ -130,7 +130,7 @@ def forest_transplanting(root):
     new_root = etree.Element("new_root")
 
     #root_siblings_preceding.reverse()
-    new_root.extend(chain(root.itersiblings(preceding=True), [root], root.itersiblings()))
+    new_root.extend(chain(reversed(root.itersiblings(preceding=True)), (root,), root.itersiblings()))
     #new_root.append(root)
     #new_root.extend(root_siblings)
     return new_root, True
