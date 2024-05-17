@@ -130,8 +130,9 @@ def forest_transplanting(root):
     new_root = etree.Element("new_root")
 
     root_siblings_preceding.reverse()
-    for node in chain(root_siblings_preceding, [root], root_siblings):
-        new_root.append(node)
+    new_root.extend(root_siblings_preceding(
+    new_root.append(root)
+    new_root.extend(root_siblings)
     return new_root, True
 
 # Return str Utf-8 of matched rules
