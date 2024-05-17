@@ -124,13 +124,13 @@ def forest_transplanting(root):
     """
     from lxml import etree
 
-    #root_siblings_preceding = [ s for s in ]
+    root_siblings_preceding =  tuple(s for s in root.itersiblings(preceding=True))
     #root_siblings = [s for s in ]
 
     new_root = etree.Element("new_root")
 
     #root_siblings_preceding.reverse()
-    new_root.extend(chain(reversed(root.itersiblings(preceding=True)), (root,), root.itersiblings()))
+    new_root.extend(chain(reversed(root_siblings_preceding), (root,), root.itersiblings()))
     #new_root.append(root)
     #new_root.extend(root_siblings)
     return new_root, True
