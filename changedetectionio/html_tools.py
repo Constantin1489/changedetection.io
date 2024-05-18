@@ -11,6 +11,7 @@ import json
 import re
 from itertools import chain
 from elementpath import select as elementpath_select
+from elementpath import XPathNode
 # xpath 2.0-3.1
 from elementpath.xpath3 import XPath3Parser
 
@@ -79,15 +80,13 @@ def elementpath_tostring(obj):
     # The MIT License (MIT), Copyright (c), 2018-2021, SISSA (Scuola Internazionale Superiore di Studi Avanzati)
     # https://github.com/sissaschool/elementpath/blob/dfcc2fd3d6011b16e02bf30459a7924f547b47d0/elementpath/xpath_tokens.py#L1038
     """
-
-    import elementpath
     from decimal import Decimal
     import math
 
     if obj is None:
         return ''
     # https://elementpath.readthedocs.io/en/latest/xpath_api.html#elementpath.select
-    elif isinstance(obj, elementpath.XPathNode):
+    elif isinstance(obj, XPathNode):
         return obj.string_value
     elif isinstance(obj, bool):
         return 'true' if obj else 'false'
