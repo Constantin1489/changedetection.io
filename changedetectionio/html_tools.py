@@ -1,12 +1,13 @@
 from typing import List
+from lxml import etree
 import json
 import re
 
-
 # HTML added to be sure each result matching a filter (.example) gets converted to a new line by Inscriptis
 TEXT_FILTER_LIST_LINE_SUFFIX = "<br>"
-
+TRANSLATE_WHITESPACE_TABLE = str.maketrans('', '', '\r\n\t ')
 PERL_STYLE_REGEX = r'^/(.*?)/([a-z]*)?$'
+
 # 'price' , 'lowPrice', 'highPrice' are usually under here
 # All of those may or may not appear on different websites - I didnt find a way todo case-insensitive searching here
 LD_JSON_PRODUCT_OFFER_SELECTORS = ["json:$..offers", "json:$..Offers"]
@@ -53,15 +54,65 @@ def include_filters(include_filters, html_content, append_pretty_line_formatting
 def subtractive_css_selector(css_selector, html_content):
     from bs4 import BeautifulSoup
     soup = BeautifulSoup(html_content, "html.parser")
-    for item in soup.select(css_selector):
+
+    # So that the elements dont shift their index, build a list of elements here which will be pointers to their place in the DOM
+    elements_to_remove = soup.select(css_selector)
+
+    # Then, remove them in a separate loop
+    for item in elements_to_remove:
         item.decompose()
+
     return str(soup)
+
+def subtractive_xpath_selector(selectors: List[str], html_content: str) -> str:
+    # Parse the HTML content using lxml
+    html_tree = etree.HTML(html_content)
+
+    # First, collect all elements to remove
+    elements_to_remove = []
+
+    # Iterate over the list of XPath selectors
+    for selector in selectors:
+        # Collect elements for each selector
+        elements_to_remove.extend(html_tree.xpath(selector))
+
+    # Then, remove them in a separate loop
+    for element in elements_to_remove:
+        if element.getparent() is not None:  # Ensure the element has a parent before removing
+            element.getparent().remove(element)
+
+    # Convert the modified HTML tree back to a string
+    modified_html = etree.tostring(html_tree, method="html").decode("utf-8")
+    return modified_html
 
 
 def element_removal(selectors: List[str], html_content):
-    """Joins individual filters into one css filter."""
-    selector = ",".join(selectors)
-    return subtractive_css_selector(selector, html_content)
+    """Removes elements that match a list of CSS or XPath selectors."""
+    modified_html = html_content
+    css_selectors = []
+    xpath_selectors = []
+
+    for selector in selectors:
+        if selector.startswith(('xpath:', 'xpath1:', '//')):
+            # Handle XPath selectors separately
+            xpath_selector = selector.removeprefix('xpath:').removeprefix('xpath1:')
+            xpath_selectors.append(xpath_selector)
+        else:
+            # Collect CSS selectors as one "hit", see comment in subtractive_css_selector
+            css_selectors.append(selector.strip().strip(","))
+
+    if xpath_selectors:
+        modified_html = subtractive_xpath_selector(xpath_selectors, modified_html)
+
+    if css_selectors:
+        # Remove duplicates, then combine all CSS selectors into one string, separated by commas
+        # This stops the elements index shifting
+        unique_selectors = list(set(css_selectors))  # Ensure uniqueness
+        combined_css_selector = " , ".join(unique_selectors)
+        modified_html = subtractive_css_selector(combined_css_selector, modified_html)
+
+
+    return modified_html
 
 def elementpath_tostring(obj):
     """
@@ -310,6 +361,7 @@ def extract_json_as_string(content, json_filter, ensure_is_ldjson_info_type=None
 #          - "line numbers" return a list of line numbers that match (int list)
 #
 # wordlist - list of regex's (str) or words (str)
+# Preserves all linefeeds and other whitespacing, its not the job of this to remove that
 def strip_ignore_text(content, wordlist, mode="content"):
     i = 0
     output = []
@@ -325,32 +377,30 @@ def strip_ignore_text(content, wordlist, mode="content"):
         else:
             ignore_text.append(k.strip())
 
-    for line in content.splitlines():
+    for line in content.splitlines(keepends=True):
         i += 1
         # Always ignore blank lines in this mode. (when this function gets called)
         got_match = False
-        if len(line.strip()):
-            for l in ignore_text:
-                if l.lower() in line.lower():
+        for l in ignore_text:
+            if l.lower() in line.lower():
+                got_match = True
+
+        if not got_match:
+            for r in ignore_regex:
+                if r.search(line):
                     got_match = True
 
-            if not got_match:
-                for r in ignore_regex:
-                    if r.search(line):
-                        got_match = True
-
-            if not got_match:
-                # Not ignored
-                output.append(line.encode('utf8'))
-            else:
-                ignored_line_numbers.append(i)
-
+        if not got_match:
+            # Not ignored, and should preserve "keepends"
+            output.append(line)
+        else:
+            ignored_line_numbers.append(i)
 
     # Used for finding out what to highlight
     if mode == "line numbers":
         return ignored_line_numbers
 
-    return "\n".encode('utf8').join(output)
+    return ''.join(output)
 
 def cdata_in_document_to_text(html_content: str, render_anchor_tag_content=False) -> str:
     from xml.sax.saxutils import escape as xml_escape

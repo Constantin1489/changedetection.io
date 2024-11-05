@@ -81,7 +81,8 @@ class update_worker(threading.Thread):
             'watch_url': watch.get('url') if watch else None,
         })
 
-        n_object.update(watch.extra_notification_token_values())
+        if watch:
+            n_object.update(watch.extra_notification_token_values())
 
         logger.trace(f"Main rendered notification placeholders (diff_added etc) calculated in {time.time()-now:.3f}s")
         logger.debug("Queued notification for sending")
@@ -189,7 +190,9 @@ class update_worker(threading.Thread):
                 'screenshot': None
             })
             self.notification_q.put(n_object)
-            logger.error(f"Sent filter not found notification for {watch_uuid}")
+            logger.debug(f"Sent filter not found notification for {watch_uuid}")
+        else:
+            logger.debug(f"NOT sending filter not found notification for {watch_uuid} - no notification URLs")
 
     def send_step_failure_notification(self, watch_uuid, step_n):
         watch = self.datastore.data['watching'].get(watch_uuid, False)
@@ -258,9 +261,6 @@ class update_worker(threading.Thread):
                     try:
                         # Processor is what we are using for detecting the "Change"
                         processor = watch.get('processor', 'text_json_diff')
-                        # Abort processing when the content was the same as the last fetch
-                        skip_when_same_checksum = queued_item_data.item.get('skip_when_checksum_same')
-
 
                         # Init a new 'difference_detection_processor', first look in processors
                         processor_module_name = f"changedetectionio.processors.{processor}.processor"
@@ -276,16 +276,13 @@ class update_worker(threading.Thread):
 
                         update_handler.call_browser()
 
-                        changed_detected, update_obj, contents = update_handler.run_changedetection(
-                            watch=watch,
-                            skip_when_checksum_same=skip_when_same_checksum,
-                        )
+                        changed_detected, update_obj, contents = update_handler.run_changedetection(watch=watch)
 
                         # Re #342
                         # In Python 3, all strings are sequences of Unicode characters. There is a bytes type that holds raw bytes.
                         # We then convert/.decode('utf-8') for the notification etc
-                        if not isinstance(contents, (bytes, bytearray)):
-                            raise Exception("Error - returned data from the fetch handler SHOULD be bytes")
+#                        if not isinstance(contents, (bytes, bytearray)):
+#                            raise Exception("Error - returned data from the fetch handler SHOULD be bytes")
                     except PermissionError as e:
                         logger.critical(f"File permission error updating file, watch: {uuid}")
                         logger.critical(str(e))
@@ -336,7 +333,8 @@ class update_worker(threading.Thread):
                         elif e.status_code == 500:
                             err_text = "Error - 500 (Internal server error) received from the web site"
                         else:
-                            err_text = "Error - Request returned a HTTP error code {}".format(str(e.status_code))
+                            extra = ' (Access denied or blocked)' if str(e.status_code).startswith('4') else ''
+                            err_text = f"Error - Request returned a HTTP error code {e.status_code}{extra}"
 
                         if e.screenshot:
                             watch.save_screenshot(screenshot=e.screenshot, as_error=True)
@@ -364,18 +362,22 @@ class update_worker(threading.Thread):
 
                         # Only when enabled, send the notification
                         if watch.get('filter_failure_notification_send', False):
-                            c = watch.get('consecutive_filter_failures', 5)
+                            c = watch.get('consecutive_filter_failures', 0)
                             c += 1
                             # Send notification if we reached the threshold?
-                            threshold = self.datastore.data['settings']['application'].get('filter_failure_notification_threshold_attempts',
-                                                                                           0)
-                            logger.warning(f"Filter for {uuid} not found, consecutive_filter_failures: {c}")
-                            if threshold > 0 and c >= threshold:
+                            threshold = self.datastore.data['settings']['application'].get('filter_failure_notification_threshold_attempts', 0)
+                            logger.debug(f"Filter for {uuid} not found, consecutive_filter_failures: {c} of threshold {threshold}")
+                            if c >= threshold:
                                 if not watch.get('notification_muted'):
+                                    logger.debug(f"Sending filter failed notification for {uuid}")
                                     self.send_filter_failure_notification(uuid)
                                 c = 0
+                                logger.debug(f"Reset filter failure count back to zero")
 
                             self.datastore.update_watch(uuid=uuid, update_obj={'consecutive_filter_failures': c})
+                        else:
+                            logger.trace(f"{uuid} - filter_failure_notification_send not enabled, skipping")
+
 
                         process_changedetection_results = False
 
@@ -422,7 +424,7 @@ class update_worker(threading.Thread):
                                                     )
 
                         if watch.get('filter_failure_notification_send', False):
-                            c = watch.get('consecutive_filter_failures', 5)
+                            c = watch.get('consecutive_filter_failures', 0)
                             c += 1
                             # Send notification if we reached the threshold?
                             threshold = self.datastore.data['settings']['application'].get('filter_failure_notification_threshold_attempts',
@@ -484,6 +486,8 @@ class update_worker(threading.Thread):
                         # Crash protection, the watch entry could have been removed by this point (during a slow chrome fetch etc)
                         if not self.datastore.data['watching'].get(uuid):
                             continue
+
+                        update_obj['content-type'] = update_handler.fetcher.get_all_headers().get('content-type', '').lower()
 
                         # Mark that we never had any failures
                         if not watch.get('ignore_status_codes'):

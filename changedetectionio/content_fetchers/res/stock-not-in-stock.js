@@ -30,6 +30,8 @@ function isItemInStock() {
         'dieser artikel ist bald wieder verfügbar',
         'dostępne wkrótce',
         'en rupture de stock',
+        'esgotado',
+        'indisponível',
         'isn\'t in stock right now',
         'isnt in stock right now',
         'isn’t in stock right now',
@@ -57,6 +59,7 @@ function isItemInStock() {
         'notify me when available',
         'notify me',
         'notify when available',
+        'não disponível',
         'não estamos a aceitar encomendas',
         'out of stock',
         'out-of-stock',
@@ -154,10 +157,14 @@ function isItemInStock() {
         }
 
         elementText = "";
-        if (element.tagName.toLowerCase() === "input") {
-            elementText = element.value.toLowerCase().trim();
-        } else {
-            elementText = getElementBaseText(element);
+        try {
+            if (element.tagName.toLowerCase() === "input") {
+                elementText = element.value.toLowerCase().trim();
+            } else {
+                elementText = getElementBaseText(element);
+            }
+        } catch (e) {
+            console.warn('stock-not-in-stock.js scraper - handling element for gettext failed', e);
         }
 
         if (elementText.length) {
